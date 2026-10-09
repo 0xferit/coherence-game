@@ -4,7 +4,7 @@ The objections a sceptical room raises beyond the five on the deck, in the order
 
 ## 1. "You pay me to forecast the room, not to read the evidence."
 
-Yes. The game pays for coherence with the room, and the phone says so: graded against the jury, not against the truth. The claim is narrower than it sounds. Not that the centre is true, but that it is this jury's shared reading of a public prompt, reproducible from the sealed scores and published with them. The bet is that a concrete prompt with anchors and worked examples makes "how careful people apply this prompt" and "my own careful reading" the same forecast. Where the room's reading tracks fame or taste instead, the prompt failed, and the published results show it.
+Yes, and slide 6 says so first: it is a Keynesian beauty contest. The game pays for coherence with the room, and the phone says so: graded against the jury, not against the truth. The claim is narrower than it sounds. Not that the centre is true, but that it is this jury's shared reading of a public prompt, reproducible from the sealed scores and published with them. What the design changes in Keynes's contest is the judging criteria: written down, with anchors and worked examples, so the thing to anticipate is how careful strangers read a text that is in front of everyone. The bet is that this makes "how the room applies this prompt" and "my own careful reading" the same forecast. The target is the room's mean itself, not two-thirds of it, so the unravelling of the guessing-game experiments does not apply: any shared reading is stable, and the room moves off the evidence only when it shares a belief that others will deviate, which is the famous-nominee case. Where the room's reading tracks fame or taste instead, the prompt failed, and the published results show it.
 
 Concede: a shared prejudice is also a shared reading, and the design cannot tell them apart; only the policy process can.
 
@@ -84,7 +84,7 @@ Concede: under this prompt, infrastructure that matters to one field cannot scor
 
 ## 12. "Output agreement has uninformative equilibria, and the known fixes reward the opposite."
 
-Right. This is an output-agreement mechanism, and the theory says truthful reporting is an equilibrium only when a juror's own signal is the best predictor of the others'. The public prompt, anchors and evidence are an attempt to make that condition hold; where a famous nominee has a known popular answer that differs from the evidence, it fails and the mechanism pays the popular answer. Output agreement was chosen for legibility: a juror can understand the payout from one picture. Bayesian truth serum and surprisingly-popular scoring have better theory and need a second report from every juror; testing them on the same docket is the obvious next experiment.
+Right. This is an output-agreement mechanism, and the theory says truthful reporting is an equilibrium only when a juror's own signal is the best predictor of the others'. The public prompt, anchors and evidence are an attempt to make that condition hold; where a famous nominee has a known popular answer that differs from the evidence, it fails and the mechanism pays the popular answer. Output agreement was chosen for legibility: a juror can understand the payout from one picture. Bayesian truth serum and surprisingly-popular scoring have better theory and need a second report from every juror; testing them on the same docket is the obvious next experiment. Keynes, Schelling and output agreement are three names for one situation: Keynes named the worry, Schelling the resolution, and peer prediction the condition under which the resolution holds.
 
 Avoid: "a design argument, not a proof" as the whole answer. The literature has the counter-result; say what we chose and why.
 
@@ -98,7 +98,7 @@ Lotteries settle ties above a threshold, and the threshold is still a judgment. 
 
 ## 15. "This is Kleros."
 
-Kleros and SchellingCoin are the ancestors, and their record is the reason the deck lists collusion and vote buying. What differs: a continuous score with a band from the jury's own spread instead of a binary majority, a linear payout by closeness, a published prompt as the focal point rather than the truth of a dispute, and in the funded rounds a named expert jury under an agreement rather than anonymous stakers. The "vote the expected majority" pathology seen there is question 1 in the wild.
+Kleros and SchellingCoin are the ancestors, and their record is the reason the deck lists collusion and vote buying. What differs: a continuous score with a band from the jury's own spread instead of a binary majority, a linear payout by closeness, a published prompt as the focal point rather than the truth of a dispute, and in the funded rounds a named expert jury under an agreement rather than anonymous stakers. The "vote the expected majority" pathology seen there is the beauty contest of question 1 in the wild.
 
 Avoid: "ours is sealed." So is theirs.
 
