@@ -44,7 +44,7 @@ The 45-minute version: three nominees (Inkscape, Linux, arXiv), the objections i
 ## If something goes wrong
 
 - **Your laptop drops.** Open the room on your phone, press "Take over" and confirm. Hosting moves to the phone with the game intact.
-- **The connection is bad for everyone.** Hand out the score sheets. Each juror writes a score per nominee; you collect them after each round, type the opened scores into `/paper/` on any device that has a signal, or later, and read the results aloud. The same ledger grades them.
+- **The connection is bad for everyone.** Hand out the score sheets, one per juror for the whole docket. Each round, jurors write the score in that nominee's row and fold the sheet; when you say "open", they read their scores aloud in seat order and you type them into `/paper/` on any device that has a signal, or later, and read the results aloud. The same ledger grades them. Collect the sheets at the end if you want the record.
 - **A screen says the game moved on.** Someone else pressed a host button first. Look at the screen again; nothing was lost.
 - **A nominee goes badly wrong.** "End the game" keeps everything graded so far and shows the final standings. "New game" sends everyone back to the summon screen and reseats them with one tap.
 - **A stranger joined the room from the internet.** Remove the seat with its cross in the lobby. The room code is on paper only; wipe the room after the session.
