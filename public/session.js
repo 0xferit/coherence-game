@@ -22,6 +22,10 @@ export const SESSION = Object.freeze({
   paperDoi: PAPER_DOI,
   paperUrl: `https://doi.org/${PAPER_DOI}`,
   attribution: `${PROJECT} research by Ferit Tunçer.`,
+  support: "Supported by Octant.",
+  nextRound:
+    "Arrow, the first funded round of this design, runs at Octant in early 2027: an invited jury of domain experts scores a real docket under a published policy.",
+  nextRoundUrl: "https://octant.build",
   copyright: COPYRIGHT,
   codeLicence: CODE_LICENCE,
   contentLicence: CONTENT_LICENCE,
