@@ -1,0 +1,52 @@
+# Facilitator guide
+
+How to run the ninety-minute session with the kit on this site. Times are from the start of the session. Deck slides are numbered as on screen; the game's buttons are quoted as they appear.
+
+## The day before
+
+- Print thirty copies of the handout (`/handout/handout.pdf`, A4) and the score sheets (`/paper/sheets.html`, two A5 sheets per A4 page, fifteen pages for thirty jurors). Scan the three codes on a printed handout with a phone: the room, the working paper and the mailing list must all open.
+- Open the room on your laptop and on your phone: `/r/leiden`. If a game from a rehearsal is still there, use "Wipe all" in the host console and confirm.
+- Charge the laptop and the phone. The session runs on their batteries if the venue has no sockets.
+- Put the deck on the laptop: `/deck/`. Arrow keys move between slides; it reads on a phone too, so participants can follow on their own screen.
+
+## At the venue, before people arrive
+
+- Check the Wi-Fi or mobile signal from both devices. Load `/r/leiden` on the phone over mobile data as well, so you know which network works.
+- Summon the jury from the laptop: enter your name, leave the six nominees of the docket ticked (Inkscape, Linux, PDF, LaTeX, arXiv, NumPy), press "Summon a jury and host it". The seven spares stay unticked unless the room is fast; the docket cannot change once summoned.
+- Leave the laptop on the lobby screen. Keep the handouts and a few score sheets at hand.
+
+## Run of show
+
+| Time | Deck | What you do |
+|---|---|---|
+| 0:00 | 1 to 3 | The claim: every funding round ends in a split that needs numbers nobody can verify; "what happened" and "how much does it matter" are two questions, and today is about the second. |
+| 0:10 | 4 | Everyone scans the room code on the handout, or types the address. Each person enters a name and presses "Take a seat". Watch the seated count in the status bar reach the room. Remove a duplicate or stray seat with the cross on its chip while still in the lobby. |
+| 0:13 | 5 and 6 | Read the policy together: the question, the five anchors, the three worked examples, the four things that are not the jury's job. Then how they are paid: nearer the centre, more of the pot; beyond the band, a forfeit that grows with distance. |
+| 0:15 | 7 | Play. Press "Open Inkscape". Sixty seconds show in everyone's status bar. "Close and reveal" unlocks when everyone has sealed or recused, or when time is up. Press it, wait for "Everyone has revealed." (a sleeping phone shows under "Not yet revealed"), press "Grade". Walk the room through its own results: the mean, the band, who was paid, who forfeited, the note under the table. Press "Next nominee". Repeat for Linux, PDF, LaTeX, arXiv and NumPy. About five minutes per nominee. |
+| 0:45 | 8 to 12 | The objections, in the order the room raises them, using the room's own rounds: herding, vote buying, collusion (the arXiv round: about half the jurors had a private instruction to score 0.10; the banner on its results says what the bloc did), a vague policy, fake identities. |
+| 1:15 | 13 | Where it fits: review panels, grant programmes, community funds. What it costs: a public policy, a docket, a room and an hour. |
+| 1:20 | 14 | Close. Questions. The paper and the mailing-list codes are on the slide and on the handout. Press "Finish" after the last nominee if you have not already; the final standings stay on every phone. |
+
+The 45-minute version: three nominees (Inkscape, Linux, arXiv), the objections in fifteen minutes, no slide 13.
+
+## While the room plays
+
+- A juror who does not know a nominee presses "I do not know enough": no stake, no share, no fine for silence. They can take the seat back while scoring is open.
+- A juror may change a sealed score until you close. The chip shows a small arrow for a changed seal.
+- Proofs: by default each juror's proof (score and two words) is on their own screen. Anyone who reads another juror's proof can type it into "Report" and take a bounty from the juror who showed it; the showing juror loses more. "Proofs: on screen" in the host console switches proofs behind a button if you want showing to be a deliberate act.
+- A juror whose phone slept through the reveal is counted as not revealing for that nominee; their seal opens when the phone wakes but no longer counts. Say so before the first round so nobody is surprised.
+- Late arrivals take a seat whenever they like; they are at stake only from the next nominee you open.
+
+## If something goes wrong
+
+- **Your laptop drops.** Open the room on your phone, press "Take over" and confirm. Hosting moves to the phone with the game intact.
+- **The connection is bad for everyone.** Hand out the score sheets. Each juror writes a score per nominee; you collect them after each round, type the opened scores into `/paper/` on any device that has a signal, or later, and read the results aloud. The same ledger grades them.
+- **A screen says the game moved on.** Someone else pressed a host button first. Look at the screen again; nothing was lost.
+- **A nominee goes badly wrong.** "End the game" keeps everything graded so far and shows the final standings. "New game" sends everyone back to the summon screen and reseats them with one tap.
+- **A stranger joined the room from the internet.** Remove the seat with its cross in the lobby. The room code is on paper only; wipe the room after the session.
+
+## After the session
+
+- Press "Finish" or "End the game", leave the standings up for photographs, then "Wipe all" and confirm.
+- Export the mailing-list sign-ups with the export token (see the README) and import them into your mailer.
+- Note what the room said at each objection; the arXiv round's banner is the data point worth keeping.
