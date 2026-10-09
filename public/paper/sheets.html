@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Paper score sheets</title><link rel="icon" href="data:,"><link rel="stylesheet" href="/paper.css"><style>body{margin:0}.toolbar{padding:1.2rem;max-width:210mm;margin:auto;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}.sheet-page{max-width:210mm;margin:1rem auto;background:white;color:var(--ink)}.score-sheet{padding:1.2rem;border-bottom:1px dashed var(--hair);display:flex;flex-direction:column;gap:.7rem}.score-sheet h1{font-size:1.4rem}.score-sheet h2{font-size:1rem}.name-line{font:.85rem var(--mono);padding-bottom:.6rem}.score-sheet table{font-size:.8rem}.score-sheet td{height:2.7rem}.score-sheet th{font-size:.65rem}.score-sheet td:first-child{width:32%}.score-sheet th:nth-child(2){width:22%}.score-sheet .fine{font-size:.65rem}.score-sheet p{max-width:100%}.sheet-number{display:flex;justify-content:space-between;gap:.5rem}.sheet-number span{font:.65rem var(--mono);color:var(--muted)}.sheet-rule{font-size:.85rem}.score-sheet td{border:1px solid var(--hair)}.score-sheet th{padding:.4rem .3rem}.score-sheet .name-line{display:flex;gap:.6rem}.name-line span{flex:1;border-bottom:1px solid var(--muted)}
+@media print{@page{size:A4 portrait;margin:0}.toolbar{display:none}.sheet-page{width:210mm;height:297mm;max-width:none;margin:0;break-after:page}.sheet-page:last-child{break-after:auto}.score-sheet{width:210mm;height:148.5mm;padding:10mm 12mm;gap:3mm;break-inside:avoid}.score-sheet h1{font-size:15pt}.score-sheet h2{font-size:10pt}.sheet-rule{font-size:9pt;line-height:1.3}.name-line{font-size:9pt;padding-bottom:1mm}.score-sheet table{font-size:10pt}.score-sheet th{font-size:8pt}.score-sheet td{height:12mm}.score-sheet .fine{font-size:7pt;line-height:1.3}.sheet-number span{font-size:7pt}}
+</style></head><body><div class="toolbar no-print"><a href="/paper/">Paper calculator</a><button type="button" id="print">Print sheets</button><p id="feedback" class="banner bad" role="alert" hidden></p></div><main id="sheets"></main><script type="module">
+import { SESSION } from "/session.js";
+import { POLICY, NOMINEES, DEFAULT_DOCKET_KEYS } from "/domain.js";
+const DEFAULT_JURORS = 30;
+const MAX_JURORS = 100;
+const SHEETS_PER_PAGE = 2;
+const requested = new URLSearchParams(location.search).get("jurors");
+const count = requested === null ? DEFAULT_JURORS : Number(requested);
+if (!Number.isInteger(count) || count < 1 || count > MAX_JURORS) {
+  document.getElementById("feedback").textContent = `Choose a whole juror count between 1 and ${MAX_JURORS}.`;
+  document.getElementById("feedback").hidden = false;
+  document.getElementById("print").disabled = true;
+} else {
+  let page;
+  for (let index = 0; index < count; index++) {
+    if (index % SHEETS_PER_PAGE === 0) { page = document.createElement("section"); page.className = "sheet-page"; document.getElementById("sheets").append(page); }
+    const sheet = document.createElement("article");
+    sheet.className = "score-sheet";
+    const header = document.createElement("div");
+    header.className = "sheet-number";
+    const project = document.createElement("span"); project.textContent = SESSION.project;
+    const seat = document.createElement("span"); seat.textContent = `Juror ${index + 1} / ${count}`;
+    header.append(project, seat); sheet.append(header);
+    const title = document.createElement("h1"); title.textContent = "Coherence game: score sheet"; sheet.append(title);
+    const question = document.createElement("p"); question.className = "sheet-rule"; question.textContent = POLICY.question; sheet.append(question);
+    const name = document.createElement("div"); name.className = "name-line"; name.append("Your name:", document.createElement("span")); sheet.append(name);
+    const table = document.createElement("table");
+    const head = table.createTHead().insertRow();
+    for (const text of ["Nominee", "Score 0.00 to 1.00", "Salt word 1", "Salt word 2"]) { const th = document.createElement("th"); th.scope = "col"; th.textContent = text; head.append(th); }
+    const body = table.createTBody();
+    for (const key of DEFAULT_DOCKET_KEYS) { const row = body.insertRow(); const title = row.insertCell(); title.textContent = NOMINEES.find((nominee) => nominee.key === key).name; for (let blank = 0; blank < head.cells.length - 1; blank++) row.insertCell(); }
+    sheet.append(table);
+    const anchors = document.createElement("p");
+    anchors.className = "fine";
+    anchors.textContent = POLICY.anchors.map(([score, label]) => `${score}: ${label}`).join(" · ");
+    sheet.append(anchors);
+    const instructions = document.createElement("p"); instructions.className = "fine"; instructions.textContent = "Read the policy and worked anchors. Write your score alone; keep the score and salt words folded away until the host asks you to open. Write ‘recuse’ instead of a score if you cannot apply the policy. The salt words support a sealing demonstration; paper scores are not cryptographically sealed."; sheet.append(instructions);
+    page.append(sheet);
+  }
+}
+document.getElementById("print").addEventListener("click", () => print());
+document.documentElement.dataset.ready = "true";
+</script></body></html>

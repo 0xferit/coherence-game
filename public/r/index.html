@@ -1,0 +1,1534 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Coherence game</title>
+<link rel="icon" href="data:,"><link rel="stylesheet" href="/paper.css">
+<style>
+
+
+
+
+  .wrap{max-width:min(1480px,96vw);margin-inline:auto;padding-inline:clamp(1rem,2.5vw,2rem);
+        padding-block:clamp(1rem,2vh,1.4rem);display:flex;flex-direction:column;gap:.85rem}
+  .split{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);
+         gap:.85rem;align-items:start}
+  .stack{display:flex;flex-direction:column;gap:.85rem;min-width:0}
+  @media (max-width:900px){ .split{grid-template-columns:1fr} }
+  @media (min-width:1200px){
+    body{font-size:1.06rem}
+    .law-q{font-size:1.5rem}
+    .rubric table{font-size:.8rem}
+  }
+
+  header.bar{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;
+             border-bottom:1px solid var(--hair);padding-bottom:.6rem}
+  .brand{display:flex;align-items:center;gap:.9rem;font-family:var(--serif);font-size:1.35rem;
+         line-height:1;font-weight:600}
+  .status{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;
+          color:var(--muted);display:flex;gap:.9rem;flex-wrap:wrap;align-items:baseline}
+  .status b{color:var(--ink);font-weight:600}
+  .status .warn{color:var(--charge)}
+
+
+
+
+
+
+
+
+
+  .law{background:var(--sunk);border-left:3px solid var(--upheld);padding:.8rem .95rem;
+       display:flex;flex-direction:column;gap:.6rem}
+  .law-q{font-family:var(--serif);font-size:clamp(1rem,2.2vw,1.25rem);line-height:1.3}
+  .scaleviz{display:flex;flex-direction:column;gap:.25rem}
+  .scaleviz .bar{height:8px;border-radius:4px;
+    background:linear-gradient(90deg,var(--hair),var(--upheld-soft),var(--upheld))}
+  .scaleviz .ticks{display:flex;justify-content:space-between;font-family:var(--mono);
+                   font-size:.62rem;color:var(--muted);gap:.3rem}
+  .scaleviz .ticks span{flex:1;text-align:center}
+  .scaleviz .ticks span:first-child{text-align:left}
+  .scaleviz .ticks span:last-child{text-align:right}
+  .scaleviz .ticks b{display:block;color:var(--ink);font-size:.72rem;font-weight:600}
+  .lawkey{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;
+          font-weight:500;color:var(--upheld)}
+  .lawkey.no{color:var(--charge)}
+  .rubric{overflow-x:auto;margin-top:-.25rem}
+  .rubric table{font-size:.74rem;table-layout:auto}
+  .rubric th{text-transform:none;letter-spacing:.01em;font-size:.66rem;white-space:nowrap;
+             padding-bottom:.15rem}
+  .rubric td{color:var(--muted);white-space:nowrap}
+
+  .rubric td.s{white-space:normal}
+  @media (max-width:600px){
+    .rubric th,.rubric td{white-space:normal;padding:.3rem .3rem}
+    .rubric table{font-size:.7rem}
+  }
+  @media (max-width:380px){ .rubric table{font-size:.64rem} }
+  .rubric td.s b{color:var(--upheld);font-variant-numeric:tabular-nums;margin-right:.45rem}
+  .nyj{display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap;
+       font-size:.84rem;color:var(--muted)}
+  .docket{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:.45rem}
+  .docket li{display:flex;align-items:baseline;gap:.45rem;border:1px solid var(--hair);
+             background:var(--sunk);padding:.35rem .65rem}
+  .docket li b{font-family:var(--serif);font-weight:400;font-size:1.05rem}
+  .docket li i{font-family:var(--mono);font-size:.62rem;color:var(--muted);font-style:normal}
+  .docket li.past{opacity:.45}
+  .docket li.now{border-color:var(--upheld);background:var(--upheld-soft)}
+  .docket li.now i{color:var(--upheld)}
+  .board{display:flex;flex-direction:column;gap:.35rem}
+  .seat{display:grid;grid-template-columns:2.6rem 1fr auto;align-items:baseline;gap:.8rem;
+        background:var(--raise);border:1px solid var(--hair);padding:.55rem .9rem}
+  .seat .rank{font-family:var(--mono);font-size:.9rem;color:var(--muted);
+              font-variant-numeric:tabular-nums}
+  .seat .who{font-family:var(--serif);font-size:clamp(1.1rem,2.4vw,1.5rem)}
+  .seat .amt{font-family:var(--mono);font-size:clamp(1.1rem,2.6vw,1.6rem);
+             font-variant-numeric:tabular-nums;color:var(--muted)}
+  .seat .amt.up{color:var(--upheld)} .seat .amt.down{color:var(--charge)}
+  .seat.me{border-color:var(--upheld)}
+  .seat.first{background:var(--upheld-soft);border-color:var(--upheld)}
+  .seat.first .rank,.seat.first .who{color:var(--upheld)}
+  .seat.first .who{font-size:clamp(1.4rem,3.4vw,2.1rem)}
+  .summonbar{flex-direction:row;justify-content:space-between;align-items:center;
+             gap:1.2rem;flex-wrap:wrap}
+  .summonbar .stack{gap:.3rem}
+  .console{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-top:.2rem;
+           padding:.5rem .7rem;border-top:2px solid var(--hair);opacity:.82}
+  .console:hover{opacity:1}
+  .ck{font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;
+      color:var(--muted);margin-right:auto}
+
+  .nomineehead{display:flex;justify-content:space-between;align-items:baseline;gap:.8rem;flex-wrap:wrap}
+  .subject{gap:.35rem}
+  .subject-name{font-size:clamp(2.2rem,5.5vw,3.4rem);line-height:1.02;letter-spacing:-.015em}
+  .subject-blurb{font-size:clamp(.95rem,1.6vw,1.15rem);line-height:1.45;color:var(--muted);max-width:40em}
+
+
+
+
+
+
+
+
+
+
+
+  .payoff{display:flex;flex-direction:column;gap:.22rem}
+
+  .payoff .pb{height:26px;border:1px solid var(--hair);position:relative;overflow:hidden;
+    background:linear-gradient(90deg,
+      color-mix(in srgb, var(--charge) 40%, transparent) 0%,
+      color-mix(in srgb, var(--charge) 40%, transparent) 18%,
+      transparent 34%,
+      color-mix(in srgb, var(--upheld) 34%, transparent) 50%,
+      transparent 66%,
+      color-mix(in srgb, var(--charge) 40%, transparent) 82%,
+      color-mix(in srgb, var(--charge) 40%, transparent) 100%)}
+  .payoff .pc{position:absolute;left:50%;top:0;bottom:0;width:2px;
+              background:var(--upheld);transform:translateX(-1px)}
+  .payoff .pl{display:flex;font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;
+              text-transform:uppercase;color:var(--charge)}
+  .payoff .pl span{flex:1;text-align:center}
+  .payoff .pl span:first-child{text-align:left}
+  .payoff .pl span:last-child{text-align:right}
+  .payoff .pl .mid{color:var(--upheld);font-weight:600}
+  .payoff .pw{font-family:var(--mono);font-size:.62rem;color:var(--muted);text-align:center}
+  .bigscore{font-family:var(--mono);font-size:clamp(3rem,13vw,5rem);line-height:1;font-weight:600;
+            font-variant-numeric:tabular-nums;color:var(--upheld);text-align:center}
+  input[type=range]{width:100%;accent-color:var(--upheld);height:2.6rem}
+  .ends{display:flex;justify-content:space-between;font-family:var(--mono);
+        font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+
+
+
+
+
+
+
+
+
+
+
+  .players{display:flex;flex-wrap:wrap;gap:.35rem}
+  .chip{font-family:var(--mono);font-size:.74rem;padding:.25rem .55rem;border:1px solid var(--hair);
+        background:var(--paper);display:flex;gap:.4rem;align-items:center}
+  .chip.me{border-color:var(--upheld)}
+  .chip.done{background:var(--upheld-soft);border-color:var(--upheld)}
+  .chip .bal{color:var(--muted);font-variant-numeric:tabular-nums}
+  .chip .up{color:var(--upheld)} .chip .down{color:var(--charge)}
+  .chip .rs{color:var(--charge)}
+  .chip.out{opacity:.5;border-style:dashed}
+
+  .verdict{display:flex;align-items:center;gap:1.2rem;padding:1rem 1.2rem;flex-wrap:wrap;
+           border:1px solid var(--hair);border-left-width:5px}
+  .verdict.win{background:var(--upheld-soft);border-left-color:var(--upheld)}
+  .verdict.lose{background:var(--charge-soft);border-left-color:var(--charge)}
+  .v-amt{font-family:var(--mono);font-size:clamp(2.8rem,11vw,4.2rem);line-height:.95;font-weight:600;
+         font-variant-numeric:tabular-nums}
+  .verdict.win .v-amt{color:var(--upheld)} .verdict.lose .v-amt{color:var(--charge)}
+  .v-side{display:flex;flex-direction:column;gap:.15rem}
+  .v-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase}
+  .verdict.win .v-label{color:var(--upheld)} .verdict.lose .v-label{color:var(--charge)}
+  .v-stats{display:flex;gap:.9rem;flex-wrap:wrap;font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+  .v-stats b{color:var(--ink);font-variant-numeric:tabular-nums}
+
+  .track{position:relative;border:1px solid var(--hair);background:var(--paper);overflow:hidden}
+  .track__penalty{position:absolute;inset:0}
+  .track__total{position:absolute;top:0;bottom:0;border-left:1px dotted var(--charge);opacity:.7}
+  .track__band{position:absolute;top:0;bottom:0;border-left:1px solid var(--upheld);
+               border-right:1px solid var(--upheld);opacity:.55}
+  .track__centre{position:absolute;top:0;bottom:0;width:2px;background:var(--upheld);transform:translateX(-1px)}
+
+  .pin{--dot:13px;position:absolute;display:flex;align-items:center;gap:5px;pointer-events:none;
+       transform:translate(calc(var(--dot) / -2),-50%)}
+  .pin.flip{flex-direction:row-reverse;transform:translate(calc(-100% + var(--dot) / 2),-50%)}
+  .pin i{width:var(--dot);height:var(--dot);border-radius:50%;border:1.5px solid var(--paper);display:block}
+  .pin span{font-family:var(--mono);font-size:.6rem;white-space:nowrap;color:var(--muted)}
+  .axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.64rem;
+        color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+
+  table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.78rem}
+  th,td{text-align:left;padding:.32rem .45rem;border-bottom:1px solid var(--hair)}
+  th{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  tr.me td{background:var(--sunk)}
+  td.up{color:var(--upheld)} td.down{color:var(--charge)}
+
+
+
+
+
+
+
+  .proofwrap{display:flex;flex-direction:column;gap:.3rem}
+  .proof-k{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;
+           color:var(--charge)}
+  .proof{font-family:var(--mono);font-size:clamp(1.1rem,2.8vw,1.6rem);background:var(--charge-soft);
+         border:1px dashed var(--charge);padding:.75rem .8rem;color:var(--charge);
+         letter-spacing:.02em;text-align:center;text-wrap:balance;user-select:all}
+
+  .hostbar{border:1px dashed var(--hair);padding:.6rem .8rem;display:flex;
+           justify-content:space-between;gap:.7rem;align-items:center;flex-wrap:wrap}
+  .hostbar h3{flex:1}
+
+
+
+  .picker{display:grid;gap:.4rem}
+  .picker label{display:flex;gap:.55rem;align-items:baseline;font-size:.95rem;cursor:pointer}
+  .picker label small{color:var(--muted);font-family:var(--mono);font-size:.68rem}
+  .picker input{accent-color:var(--upheld)}
+
+
+  .unrevealed{font-family:var(--mono);font-size:.78rem;color:var(--charge)}
+  .net-banner{position:sticky;top:0;z-index:5}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <div class="brand"><span class="dc-brand" id="session-project"></span><span>Coherence game</span></div>
+    <div class="status" id="status"></div>
+  </header>
+  <main id="app"><div class="card"><p class="fine">Connecting to the room…</p></div></main>
+<footer class="fine" id="session-attribution"></footer>
+</div>
+<script type="module">
+import "/core.js";
+import { SESSION } from "/session.js";
+document.getElementById("session-project").textContent = SESSION.project;
+document.getElementById("session-attribution").textContent = SESSION.attribution;
+import { connect } from "/store.js";
+import { POLICY, NOMINEES, DEFAULT_DOCKET_KEYS } from "/domain.js";
+import { ERR, GAME_PHASE, MAX_NOMINEES, ROOM_PATH, SCORE_MIN, SCORE_MAX, parseRoomRoute, roomPath, sealText } from "/protocol.js";
+
+const C = window.JuryCore;
+const GAME_ANTE = C.GAME_ANTE;
+const LEAK_PENALTY = C.LEAK_PENALTY;
+const LEAK_BOUNTY = C.LEAK_BOUNTY;
+const COMMIT_DURATION_S = 60;
+const BLOC_FRACTION = 0.55;
+const BLOC_TOLERANCE = 0.05;
+const NEUTRAL_SCORE = (SCORE_MIN + SCORE_MAX) / 2;
+const SUMMON_LEASE_MS = 15000;
+const LABEL_FLIP = 0.5;
+const TRACK_MIN_HEIGHT = 180;
+const TRACK_ROW_HEIGHT = 24;
+const PIN_INSET_PCT = 1.5;
+const NUMBER_LOCALE = "en-GB";
+const MINUS = "−";
+const SALT_LENGTH = 2;
+const ID_BYTES = 8;
+const SECRET_BYTES = 16;
+const EPOCH_BYTES = 5;
+const SEED_BYTES = 4;
+const MAX_NAME_LENGTH = 24;
+const MAX_CUSTOM_NAME_LENGTH = 40;
+const MAX_CUSTOM_BLURB_LENGTH = 160;
+const STORAGE_KEYS = { pid: "cg_pid", secret: "cg_secret", name: "cg_name", probe: "cg_probe" };
+const MILLISECONDS_PER_SECOND = 1000;
+const EXPIRING_WARNING_S = 10;
+const FNV32_OFFSET_BASIS = 2166136261;
+const FNV32_PRIME = 16777619;
+const UINT32_MAX = 4294967295;
+const PERCENT_SCALE = 100;
+const PIN_COLOR_MIN_PCT = 35;
+const PIN_COLOR_SPAN_PCT = 65;
+const MAILING_LIST_PATH = "/join/";
+const HANDOUT_PATH = "/handout/";
+
+const SALT_WORDS = (
+      "abandon ability able about above absent absorb abstract absurd abuse access accident account "+
+    "accuse achieve acid acoustic acquire across act action actor actress actual adapt add addict "+
+    "address adjust admit adult advance advice aerobic affair afford afraid again age agent agree "+
+    "ahead aim air airport aisle alarm album alcohol alert alien all alley allow almost alone alpha "+
+    "already also alter always amateur amazing among amount amused analyst anchor ancient anger angle "+
+    "angry animal ankle announce annual another answer antenna antique anxiety any apart apology "+
+    "appear apple approve april arch arctic area arena argue arm armed armor army around arrange "+
+    "arrest arrive arrow art artefact artist artwork ask aspect assault asset assist assume asthma "+
+    "athlete atom attack attend attitude attract auction audit august aunt author auto autumn average "+
+    "avocado avoid awake aware away awesome awful awkward axis baby bachelor bacon badge bag balance "+
+    "balcony ball bamboo banana banner bar barely bargain barrel base basic basket battle beach bean "+
+    "beauty because become beef before begin behave behind believe below belt bench benefit best "+
+    "betray better between beyond bicycle bid bike bind biology bird birth bitter black blade blame "+
+    "blanket blast bleak bless blind blood blossom blouse blue blur blush board boat body boil bomb "+
+    "bone bonus book boost border boring borrow boss bottom bounce box boy bracket brain brand brass "+
+    "brave bread breeze brick bridge brief bright bring brisk broccoli broken bronze broom brother "+
+    "brown brush bubble buddy budget buffalo build bulb bulk bullet bundle bunker burden burger burst "+
+    "bus business busy butter buyer buzz cabbage cabin cable cactus cage cake call calm camera camp "+
+    "can canal cancel candy cannon canoe canvas canyon capable capital captain car carbon card cargo "+
+    "carpet carry cart case cash casino castle casual cat catalog catch category cattle caught cause "+
+    "caution cave ceiling celery cement census century cereal certain chair chalk champion change "+
+    "chaos chapter charge chase chat cheap check cheese chef cherry chest chicken chief child chimney "+
+    "choice choose chronic chuckle chunk churn cigar cinnamon circle citizen city civil claim clap "+
+    "clarify claw clay clean clerk clever click client cliff climb clinic clip clock clog close cloth "+
+    "cloud clown club clump cluster clutch coach coast coconut code coffee coil coin collect color "+
+    "column combine come comfort comic common company concert conduct confirm congress connect "+
+    "consider control convince cook cool copper copy coral core corn correct cost cotton couch "+
+    "country couple course cousin cover coyote crack cradle craft cram crane crash crater crawl crazy "+
+    "cream credit creek crew cricket crime crisp critic crop cross crouch crowd crucial cruel cruise "+
+    "crumble crunch crush cry crystal cube culture cup cupboard curious current curtain curve cushion "+
+    "custom cute cycle dad damage damp dance danger daring dash daughter dawn day deal debate debris "+
+    "decade december decide decline decorate decrease deer defense define defy degree delay deliver "+
+    "demand demise denial dentist deny depart depend deposit depth deputy derive describe desert "+
+    "design desk despair destroy detail detect develop device devote diagram dial diamond diary dice "+
+    "diesel diet differ digital dignity dilemma dinner dinosaur direct dirt disagree discover disease "+
+    "dish dismiss disorder display distance divert divide divorce dizzy doctor document dog doll "+
+    "dolphin domain donate donkey donor door dose double dove draft dragon drama drastic draw dream "+
+    "dress drift drill drink drip drive drop drum dry duck dumb dune during dust dutch duty dwarf "+
+    "dynamic eager eagle early earn earth easily east easy echo ecology economy edge edit educate "+
+    "effort egg eight either elbow elder electric elegant element elephant elevator elite else embark "+
+    "embody embrace emerge emotion employ empower empty enable enact end endless endorse enemy energy "+
+    "enforce engage engine enhance enjoy enlist enough enrich enroll ensure enter entire entry "+
+    "envelope episode equal equip era erase erode erosion error erupt escape essay essence estate "+
+    "eternal ethics evidence evil evoke evolve exact example excess exchange excite exclude excuse "+
+    "execute exercise exhaust exhibit exile exist exit exotic expand expect expire explain expose "+
+    "express extend extra eye eyebrow fabric face faculty fade faint faith fall false fame family "+
+    "famous fan fancy fantasy farm fashion fat fatal father fatigue fault favorite feature february "+
+    "federal fee feed feel female fence festival fetch fever few fiber fiction field figure file film "+
+    "filter final find fine finger finish fire firm first fiscal fish fit fitness fix flag flame "+
+    "flash flat flavor flee flight flip float flock floor flower fluid flush fly foam focus fog foil "+
+    "fold follow food foot force forest forget fork fortune forum forward fossil foster found fox "+
+    "fragile frame frequent fresh friend fringe frog front frost frown frozen fruit fuel fun funny "+
+    "furnace fury future gadget gain galaxy gallery game gap garage garbage garden garlic garment gas "+
+    "gasp gate gather gauge gaze general genius genre gentle genuine gesture ghost giant gift giggle "+
+    "ginger giraffe girl give glad glance glare glass glide glimpse globe gloom glory glove glow glue "+
+    "goat goddess gold good goose gorilla gospel gossip govern gown grab grace grain grant grape "+
+    "grass gravity great green grid grief grit grocery group grow grunt guard guess guide guilt "+
+    "guitar gun gym habit hair half hammer hamster hand happy harbor hard harsh harvest hat have hawk "+
+    "hazard head health heart heavy hedgehog height hello helmet help hen hero hidden high hill hint "+
+    "hip hire history hobby hockey hold hole holiday hollow home honey hood hope horn horror horse "+
+    "hospital host hotel hour hover hub huge human humble humor hundred hungry hunt hurdle hurry hurt "+
+    "husband hybrid ice icon idea identify idle ignore ill illegal illness image imitate immense "+
+    "immune impact impose improve impulse inch include income increase index indicate indoor industry "+
+    "infant inflict inform inhale inherit initial inject injury inmate inner innocent input inquiry "+
+    "insane insect inside inspire install intact interest into invest invite involve iron island "+
+    "isolate issue item ivory jacket jaguar jar jazz jealous jeans jelly jewel job join joke journey "+
+    "joy judge juice jump jungle junior junk just kangaroo keen keep ketchup key kick kid kidney kind "+
+    "kingdom kiss kit kitchen kite kitten kiwi knee knife knock know lab label labor ladder lady lake "+
+    "lamp language laptop large later latin laugh laundry lava law lawn lawsuit layer lazy leader "+
+    "leaf learn leave lecture left leg legal legend leisure lemon lend length lens leopard lesson "+
+    "letter level liar liberty library license life lift light like limb limit link lion liquid list "+
+    "little live lizard load loan lobster local lock logic lonely long loop lottery loud lounge love "+
+    "loyal lucky luggage lumber lunar lunch luxury lyrics machine mad magic magnet maid mail main "+
+    "major make mammal man manage mandate mango mansion manual maple marble march margin marine "+
+    "market marriage mask mass master match material math matrix matter maximum maze meadow mean "+
+    "measure meat mechanic medal media melody melt member memory mention menu mercy merge merit merry "+
+    "mesh message metal method middle midnight milk million mimic mind minimum minor minute miracle "+
+    "mirror misery miss mistake mix mixed mixture mobile model modify mom moment monitor monkey "+
+    "monster month moon moral more morning mosquito mother motion motor mountain mouse move movie "+
+    "much muffin mule multiply muscle museum mushroom music must mutual myself mystery myth naive "+
+    "name napkin narrow nasty nation nature near neck need negative neglect neither nephew nerve nest "+
+    "net network neutral never news next nice night noble noise nominee noodle normal north nose "+
+    "notable note nothing notice novel now nuclear number nurse nut oak obey object oblige obscure "+
+    "observe obtain obvious occur ocean october odor off offer office often oil okay old olive "+
+    "olympic omit once one onion online only open opera opinion oppose option orange orbit orchard "+
+    "order ordinary organ orient original orphan ostrich other outdoor outer output outside oval oven "+
+    "over own owner oxygen oyster ozone pact paddle page pair palace palm panda panel panic panther "+
+    "paper parade parent park parrot party pass patch path patient patrol pattern pause pave payment "+
+    "peace peanut pear peasant pelican pen penalty pencil people pepper perfect permit person pet "+
+    "phone photo phrase physical piano picnic picture piece pig pigeon pill pilot pink pioneer pipe "+
+    "pistol pitch pizza place planet plastic plate play please pledge pluck plug plunge poem poet "+
+    "point polar pole police pond pony pool popular portion position possible post potato pottery "+
+    "poverty powder power practice praise predict prefer prepare present pretty prevent price pride "+
+    "primary print priority prison private prize problem process produce profit program project "+
+    "promote proof property prosper protect proud provide public pudding pull pulp pulse pumpkin "+
+    "punch pupil puppy purchase purity purpose purse push put puzzle pyramid quality quantum quarter "+
+    "question quick quit quiz quote rabbit raccoon race rack radar radio rail rain raise rally ramp "+
+    "ranch random range rapid rare rate rather raven raw razor ready real reason rebel rebuild recall "+
+    "receive recipe record recycle reduce reflect reform refuse region regret regular reject relax "+
+    "release relief rely remain remember remind remove render renew rent reopen repair repeat replace "+
+    "report require rescue resemble resist resource response result retire retreat return reunion "+
+    "reveal review reward rhythm rib ribbon rice rich ride ridge rifle right rigid ring riot ripple "+
+    "risk ritual rival river road roast robot robust rocket romance roof rookie room rose rotate "+
+    "rough round route royal rubber rude rug rule run runway rural sad saddle sadness safe sail salad "+
+    "salmon salon salt salute same sample sand satisfy satoshi sauce sausage save say scale scan "+
+    "scare scatter scene scheme school science scissors scorpion scout scrap screen script scrub sea "+
+    "search season seat second secret section security seed seek segment select sell seminar senior "+
+    "sense sentence series service session settle setup seven shadow shaft shallow share shed shell "+
+    "sheriff shield shift shine ship shiver shock shoe shoot shop short shoulder shove shrimp shrug "+
+    "shuffle shy sibling sick side siege sight sign silent silk silly silver similar simple since "+
+    "sing siren sister situate six size skate sketch ski skill skin skirt skull slab slam sleep "+
+    "slender slice slide slight slim slogan slot slow slush small smart smile smoke smooth snack "+
+    "snake snap sniff snow soap soccer social sock soda soft solar soldier solid solution solve "+
+    "someone song soon sorry sort soul sound soup source south space spare spatial spawn speak "+
+    "special speed spell spend sphere spice spider spike spin spirit split spoil sponsor spoon sport "+
+    "spot spray spread spring spy square squeeze squirrel stable stadium staff stage stairs stamp "+
+    "stand start state stay steak steel stem step stereo stick still sting stock stomach stone stool "+
+    "story stove strategy street strike strong struggle student stuff stumble style subject submit "+
+    "subway success such sudden suffer sugar suggest suit summer sun sunny sunset super supply "+
+    "supreme sure surface surge surprise surround survey suspect sustain swallow swamp swap swarm "+
+    "swear sweet swift swim swing switch sword symbol symptom syrup system table tackle tag tail "+
+    "talent talk tank tape target task taste tattoo taxi teach team tell ten tenant tennis tent term "+
+    "test text thank that theme then theory there they thing this thought three thrive throw thumb "+
+    "thunder ticket tide tiger tilt timber time tiny tip tired tissue title toast tobacco today "+
+    "toddler toe together toilet token tomato tomorrow tone tongue tonight tool tooth top topic "+
+    "topple torch tornado tortoise toss total tourist toward tower town toy track trade traffic "+
+    "tragic train transfer trap trash travel tray treat tree trend trial tribe trick trigger trim "+
+    "trip trophy trouble truck true truly trumpet trust truth try tube tuition tumble tuna tunnel "+
+    "turkey turn turtle twelve twenty twice twin twist two type typical ugly umbrella unable unaware "+
+    "uncle uncover under undo unfair unfold unhappy uniform unique unit universe unknown unlock until "+
+    "unusual unveil update upgrade uphold upon upper upset urban urge usage use used useful useless "+
+    "usual utility vacant vacuum vague valid valley valve van vanish vapor various vast vault vehicle "+
+    "velvet vendor venture venue verb verify version very vessel veteran viable vibrant vicious "+
+    "victory video view village vintage violin virtual virus visa visit visual vital vivid vocal "+
+    "voice void volcano volume vote voyage wage wagon wait walk wall walnut want warfare warm warrior "+
+    "wash wasp waste water wave way wealth weapon wear weasel weather web wedding weekend weird "+
+    "welcome west wet whale what wheat wheel when where whip whisper wide width wife wild will win "+
+    "window wine wing wink winner winter wire wisdom wise wish witness wolf woman wonder wood wool "+
+    "word work world worry worth wrap wreck wrestle wrist write wrong yard year yellow you young "+
+    "youth zebra zero zone zoo"
+).split(" ");
+
+const DEFAULT_NOMINEES = NOMINEES.filter((nominee) => DEFAULT_DOCKET_KEYS.includes(nominee.key));
+const SPARE_NOMINEES = NOMINEES.filter((nominee) => !DEFAULT_DOCKET_KEYS.includes(nominee.key));
+const KNOWN_NOMINEES = NOMINEES;
+
+function storageWorks() {
+  try {
+    localStorage.setItem(STORAGE_KEYS.probe, "1");
+    localStorage.removeItem(STORAGE_KEYS.probe);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function LS(key, value) {
+  if (value === undefined) return localStorage.getItem(key);
+  localStorage.setItem(key, value);
+  return value;
+}
+
+function randomHex(bytes) {
+  const a = new Uint8Array(bytes);
+  crypto.getRandomValues(a);
+  return Array.from(a, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function randomSalt() {
+  const a = new Uint32Array(SALT_LENGTH);
+  crypto.getRandomValues(a);
+  return Array.from(a, (v) => SALT_WORDS[v % SALT_WORDS.length]).join(" ");
+}
+
+async function commitHash(score, salt) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(sealText(score, salt)));
+  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function fmtScore(score) {
+  return (score / SCORE_MAX).toFixed(2);
+}
+
+function proofText(score, salt) {
+  return `${fmtScore(score)}  ${salt}`;
+}
+
+function parseProof(raw) {
+  const parts = String(raw).trim().toLowerCase()
+    .replace(/(\d),(\d)/g, "$1.$2")
+    .replace(/[:·;,]/g, " ")
+    .replace(/\s+/g, " ")
+    .split(" ");
+  const value = Number.parseFloat(parts[0]);
+  if (!Number.isFinite(value) || parts.length < 2) return null;
+  const score = value <= 1 ? Math.round(value * SCORE_MAX) : Math.round(value);
+  if (score < SCORE_MIN || score > SCORE_MAX || !/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(parts[0])) return null;
+  return { score, salt: parts.slice(1).join(" ") };
+}
+
+function hash32(s) {
+  let h = FNV32_OFFSET_BASIS;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, FNV32_PRIME);
+  }
+  return (h >>> 0) / UINT32_MAX;
+}
+
+function inBloc(pid, seed, fraction) {
+  return hash32(`${pid}:${seed}`) < fraction;
+}
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+}
+
+function n(x) {
+  return Math.round(x).toLocaleString(NUMBER_LOCALE);
+}
+
+function signed(d) {
+  if (Math.round(d) === 0) return "0";
+  return (d > 0 ? "+" : MINUS) + n(Math.abs(d));
+}
+
+const storageOk = storageWorks();
+const roomRoute = parseRoomRoute(location.pathname);
+const roomCode = roomRoute && !roomRoute.websocket ? roomRoute.code : null;
+let myPid = "";
+let mySecret = "";
+let myName = "";
+if (storageOk) {
+  myPid = LS(STORAGE_KEYS.pid) || LS(STORAGE_KEYS.pid, `p${randomHex(ID_BYTES)}`);
+  mySecret = LS(STORAGE_KEYS.secret) || LS(STORAGE_KEYS.secret, randomHex(SECRET_BYTES));
+  myName = LS(STORAGE_KEYS.name) || "";
+}
+
+let db = null;
+let seatedOk = false;
+let seatError = null;
+let state = null;
+let stateLoaded = false;
+let nominees = [];
+let players = [];
+let rosterLoaded = false;
+let nomineeMeta = [];
+let byNominee = [];
+let metaLoaded = false;
+let subs = [];
+let subEpoch = null;
+let myScore = NEUTRAL_SCORE;
+let showProof = false;
+let reportMsg = null;
+let busy = false;
+let pending = null;
+let seatMsg = null;
+let reseal = false;
+let netMsg = null;
+let customNominees = [];
+const pickedKeys = new Set(DEFAULT_NOMINEES.map((d) => d.key));
+let joinFocused = false;
+const opened = new Set();
+const app = document.getElementById("app");
+const statusEl = document.getElementById("status");
+
+const stateRef = () => db.doc(ROOM_PATH.STATE);
+const playersRef = (ep) => db.collection(`${ROOM_PATH.GAMES}/${ep}/${ROOM_PATH.PLAYERS}`);
+const nomineesCol = (ep) => db.collection(`${ROOM_PATH.GAMES}/${ep}/${ROOM_PATH.NOMINEES}`);
+const nomineePath = (ep, i) => `${ROOM_PATH.GAMES}/${ep}/${ROOM_PATH.NOMINEES}/${ROOM_PATH.NOMINEE_PREFIX}${i}`;
+const nomineeDoc = (ep, i) => db.doc(nomineePath(ep, i));
+const playsRef = (ep, i) => nomineeDoc(ep, i).collection(ROOM_PATH.PLAYS);
+const leaksRef = (ep, i) => nomineeDoc(ep, i).collection(ROOM_PATH.LEAKS);
+
+function liveGame(snap) {
+  const d = snap.exists ? snap.data() : null;
+  return d && d.epoch && typeof d.nomineeIdx === "number" && Array.isArray(d.docket) ? d : null;
+}
+
+function me() {
+  return players.find((p) => p.pid === myPid) || null;
+}
+
+function cur() {
+  return state ? byNominee[state.nomineeIdx] : null;
+}
+
+function meta(i) {
+  return nomineeMeta[i] || {};
+}
+
+function seatedForCurrentNominee() {
+  return !!state && (meta(state.nomineeIdx).seated || []).includes(myPid);
+}
+
+function myPlay() {
+  const c = cur();
+  return c ? c.plays.find((p) => p.pid === myPid) || null : null;
+}
+
+function isHost() {
+  return !!state && state.hostPid === myPid;
+}
+
+function nomineeDef() {
+  return state ? nominees[state.nomineeIdx] : null;
+}
+
+function pname(pid) {
+  const p = players.find((x) => x.pid === pid);
+  return p ? p.name : "a juror who has left";
+}
+
+function hostName() {
+  return state.hostPid === myPid ? "you" : pname(state.hostPid);
+}
+
+function saltKey(epoch, i, hash) {
+  return `cg_seal_${epoch}_${i}_${hash}`;
+}
+
+function storedSeal(i, play, epoch = state && state.epoch) {
+  if (!epoch || !play || !play.hash) return null;
+  const key = saltKey(epoch, i, play.hash);
+  return LS(key) || null;
+}
+
+function stateExpectation(game = state) {
+  return { epoch: game.epoch, phase: game.phase, nomineeIdx: game.nomineeIdx, hostPid: game.hostPid };
+}
+
+function playExpectation(play) {
+  return { hash: play?.hash ?? null, recused: play?.recused ?? null, revealed: play?.revealed ?? null };
+}
+
+function book() {
+  return C.ledger(nominees, byNominee, players, state);
+}
+
+function pastHashes(play) {
+  return ((play && play.past) || []).concat(play && play.hash ? [play.hash] : []);
+}
+
+function proofsOpen() {
+  return !state || state.openProofs !== false;
+}
+
+function phaseIs(name) {
+  return !!state && state.phase === name;
+}
+
+function act(label, promise) {
+  return promise.then(
+    () => {
+      if (netMsg && netMsg.label === label) {
+        netMsg = null;
+        render();
+      }
+      return true;
+    },
+    (error) => {
+      const conflict = error && error.code === ERR.CONFLICT;
+      netMsg = { label, text: conflict ? "The game moved on before that landed. Look again." : `Could not ${label}: ${error && error.message ? error.message : "no answer from the room"}.` };
+      render();
+      return false;
+    },
+  );
+}
+
+function initialState(epoch, docket, hostPid) {
+  return { phase: GAME_PHASE.LOBBY, nomineeIdx: 0, hostPid, epoch, seed: randomHex(SEED_BYTES), blocFraction: BLOC_FRACTION, openProofs: true, docket };
+}
+
+function chosenDocket() {
+  const known = KNOWN_NOMINEES.filter((d) => pickedKeys.has(d.key));
+  return known.concat(customNominees).slice(0, MAX_NOMINEES);
+}
+
+async function summonJury(name) {
+  if (busy) return;
+  busy = true;
+  seatMsg = null;
+  render();
+  try {
+    const lease = await stateRef().acquire({ holder: myPid, ttlMs: SUMMON_LEASE_MS });
+    if (!lease.acquired) {
+      seatMsg = "Someone else is summoning a jury right now.";
+    } else if (liveGame(await stateRef().get())) {
+      seatMsg = "A jury is already summoned. Take a seat in it.";
+    } else {
+      const epoch = randomHex(EPOCH_BYTES);
+      await stateRef().set(initialState(epoch, chosenDocket(), myPid), { stamp: ["startedAt"], expect: { epoch: null } });
+      await playersRef(epoch).doc(myPid).set({ pid: myPid, name }, { stamp: ["joinedAt"] });
+    }
+  } catch (error) {
+    seatMsg = `Could not summon a jury: ${error.message}.`;
+  }
+  busy = false;
+  render();
+}
+
+async function takeSeat(name) {
+  if (!state) return;
+  await act("take a seat", playersRef(state.epoch).doc(myPid).set({ pid: myPid, name }, { stamp: ["joinedAt"] }));
+}
+
+function removeSeat(pid) {
+  if (!isHost() || !phaseIs(GAME_PHASE.LOBBY)) return;
+  act("remove the seat", playersRef(state.epoch).doc(pid).delete());
+}
+
+async function openNominee() {
+  if (!phaseIs(GAME_PHASE.LOBBY) || !isHost() || !rosterLoaded || !metaLoaded) return;
+  const expect = stateExpectation();
+  const i = state.nomineeIdx;
+  const ep = state.epoch;
+  if (!meta(i).openedAt) {
+    const stamped = await act("open the nominee", nomineeDoc(ep, i).set({}, { stamp: ["openedAt"], expect: { openedAt: null } }));
+    if (!stamped) return;
+  }
+  act("open the nominee", stateRef().update({ phase: GAME_PHASE.COMMIT }, { expect }));
+}
+
+function closeScoring() {
+  if (!phaseIs(GAME_PHASE.COMMIT) || !isHost()) return;
+  act("close the scoring", stateRef().update({ phase: GAME_PHASE.REVEAL }, { expect: stateExpectation() }));
+}
+
+async function gradeNominee() {
+  if (!phaseIs(GAME_PHASE.REVEAL) || !isHost()) return;
+  const expect = stateExpectation();
+  const i = state.nomineeIdx;
+  const ep = state.epoch;
+  if (!meta(i).closedAt) {
+    const stamped = await act("grade", nomineeDoc(ep, i).update({}, { stamp: ["closedAt"], expect: { closedAt: null } }));
+    if (!stamped) return;
+  }
+  act("grade", stateRef().update({ phase: GAME_PHASE.GRADED }, { expect }));
+}
+
+function nextNominee() {
+  if (!phaseIs(GAME_PHASE.GRADED) || !isHost()) return;
+  const i = state.nomineeIdx;
+  const expect = stateExpectation();
+  const next = i + 1 < nominees.length ? { phase: GAME_PHASE.LOBBY, nomineeIdx: i + 1 } : { phase: GAME_PHASE.ENDED, gradedThrough: i + 1 };
+  act("move on", stateRef().update(next, { expect }));
+}
+
+function endGame() {
+  if (!isHost()) return;
+  const through = state.nomineeIdx + (typeof meta(state.nomineeIdx).closedAt === "number" ? 1 : 0);
+  pending = null;
+  act("end the game", stateRef().update({ phase: GAME_PHASE.ENDED, gradedThrough: through }, { expect: stateExpectation() }));
+}
+
+function newGame() {
+  if (!isHost()) return;
+  pending = null;
+  act("start a new game", stateRef().delete({ expect: stateExpectation() }));
+}
+
+function wipeAll() {
+  if (!isHost()) return;
+  pending = null;
+  act("wipe the room", db.wipe());
+}
+
+function takeOver() {
+  if (!state || !me()) return;
+  pending = null;
+  act("take over", stateRef().update({ hostPid: myPid }, { expect: stateExpectation() }));
+}
+
+function switchProofs() {
+  if (!isHost()) return;
+  act("switch the proofs", stateRef().update({ openProofs: !proofsOpen() }, { expect: stateExpectation() }));
+}
+
+async function sealScore() {
+  if (!phaseIs(GAME_PHASE.COMMIT) || !seatedOk || !seatedForCurrentNominee()) return;
+  const i = state.nomineeIdx;
+  const epoch = state.epoch;
+  const prior = myPlay();
+  const salt = randomSalt();
+  const score = myScore;
+  const hash = await commitHash(score, salt);
+  if (!phaseIs(GAME_PHASE.COMMIT) || state.epoch !== epoch || state.nomineeIdx !== i) return;
+  const key = saltKey(epoch, i, hash);
+  try { LS(key, sealText(score, salt)); }
+  catch {
+    netMsg = { label: "seal your score", text: "This browser could not save your seal. Free some site storage or use another browser before sealing." };
+    render();
+    return;
+  }
+  const ok = await act("seal your score", playsRef(epoch, i).doc(myPid).set({ pid: myPid, hash, past: pastHashes(prior), revealed: false }, { expect: playExpectation(prior) }));
+  if (ok) {
+    reseal = false;
+    render();
+  }
+}
+
+async function recuse() {
+  if (!phaseIs(GAME_PHASE.COMMIT) || !seatedOk || !seatedForCurrentNominee()) return;
+  const i = state.nomineeIdx;
+  const prior = myPlay();
+  const ok = await act("recuse yourself", playsRef(state.epoch, i).doc(myPid).set({ pid: myPid, recused: true, revealed: false, past: pastHashes(prior) }, { expect: playExpectation(prior) }));
+  if (ok) {
+    reseal = false;
+    render();
+  }
+}
+
+function unrecuse() {
+  if (!phaseIs(GAME_PHASE.COMMIT) || !seatedOk || !seatedForCurrentNominee()) return;
+  const prior = myPlay();
+  act("take your seat back", playsRef(state.epoch, state.nomineeIdx).doc(myPid).set({ pid: myPid, revealed: false, past: pastHashes(prior) }, { expect: playExpectation(prior) }));
+}
+
+async function reportProof(raw) {
+  reportMsg = null;
+  if (!phaseIs(GAME_PHASE.COMMIT)) {
+    reportMsg = { kind: "amber", text: "Reports are taken while the scoring is open." };
+    return render();
+  }
+  const proof = parseProof(raw);
+  if (!proof) {
+    reportMsg = { kind: "bad", text: "That is not a proof: a score, then the words." };
+    return render();
+  }
+  try {
+    const res = await db.report(nomineePath(state.epoch, state.nomineeIdx), proof);
+    reportMsg = res.duplicate
+      ? { kind: "amber", text: `${pname(res.leakerPid)} was already reported.` }
+      : { kind: "good", text: `Reported ${pname(res.leakerPid)}. +${n(LEAK_BOUNTY)}.` };
+    const box = document.getElementById("rep");
+    if (box) box.value = "";
+  } catch (error) {
+    reportMsg = { kind: "bad", text: error.message };
+  }
+  return render();
+}
+
+function openMySeals() {
+  if (!db || !state || !seatedOk || !stateLoaded || !metaLoaded) return;
+  byNominee.forEach((c, i) => {
+    if (!c.playsLoaded) return;
+    const closed = C.isGraded(state, i, nominees.length) || (i === state.nomineeIdx && state.phase === GAME_PHASE.REVEAL);
+    if (!closed) return;
+    const mine = c.plays.find((p) => p.pid === myPid);
+    if (!mine || !mine.hash || mine.recused || mine.revealed) return;
+    const stored = storedSeal(i, mine);
+    if (!stored) return;
+    const key = `${state.epoch}/${i}/${mine.hash}`;
+    if (opened.has(key)) return;
+    opened.add(key);
+    const sep = stored.indexOf(":");
+    act("open your seal", playsRef(state.epoch, i).doc(myPid).update({ score: +stored.slice(0, sep), salt: stored.slice(sep + 1), revealed: true }, { expect: { hash: mine.hash } }))
+      .then((ok) => { if (!ok) opened.delete(key); });
+  });
+}
+
+function secondsLeft() {
+  if (!phaseIs(GAME_PHASE.COMMIT)) return null;
+  const openedAt = meta(state.nomineeIdx).openedAt;
+  if (!openedAt) return null;
+  return Math.max(0, Math.ceil((COMMIT_DURATION_S * MILLISECONDS_PER_SECOND - (db.now() - openedAt)) / MILLISECONDS_PER_SECOND));
+}
+
+function setStatus() {
+  const b = [];
+  if (!db) b.push('<span class="warn">offline</span>');
+  else if (db.status() !== "open") b.push(`<span class="warn">${db.status() === "connecting" ? "connecting…" : "reconnecting…"}</span>`);
+  if (state) {
+    if (state.phase !== GAME_PHASE.ENDED) b.push(`<span>nominee <b>${state.nomineeIdx + 1}</b>/${nominees.length}</span>`);
+    b.push(`<span><b>${players.length}</b> seated</span>`);
+    const s = secondsLeft();
+    if (s !== null) b.push(`<span class="${s <= EXPIRING_WARNING_S ? "warn" : ""}"><b>${s}s</b> to seal</span>`);
+    const ledgerLoaded = rosterLoaded && metaLoaded && byNominee.every((_, i) => !C.isGraded(state, i, nominees.length) || loadedFor(i));
+    const bal = ledgerLoaded ? book().balance[myPid] : 0;
+    if (bal) b.push(`<span>you <b>${signed(bal)}</b></span>`);
+  }
+  statusEl.innerHTML = b.join("");
+}
+
+function banner(kind, title, text) {
+  return `<div class="banner ${kind}"><b>${esc(title)}</b>${esc(text)}</div>`;
+}
+
+function netBanner() {
+  return netMsg ? `<div class="banner bad net-banner"><b>Not saved</b>${esc(netMsg.text)}</div>` : "";
+}
+
+function lawBlock() {
+  return `<div class="law"><h3>Our curation policy for ${esc(POLICY.scope)}</h3><p class="law-q">${esc(POLICY.question)}</p>` +
+    `<div class="scaleviz"><div class="bar"></div><div class="ticks">${POLICY.anchors.map((a) => `<span><b>${a[0]}</b>${esc(a[1])}</span>`).join("")}</div></div>` +
+    '<div class="lawkey">Consider, in this order</div>' +
+    `<div class="rubric"><table><thead><tr><th>worked example</th>${POLICY.tests.map((t) => `<th>${esc(t)}</th>`).join("")}</tr></thead><tbody>` +
+    POLICY.worked.map((w) => `<tr><td class="s"><b>${w[0]}</b>${esc(w[1])}</td>${w[2].map((v) => `<td>${esc(v)}</td>`).join("")}</tr>`).join("") +
+    `</tbody></table></div><p class="nyj"><span class="lawkey no">Not your job</span>${POLICY.separate.map(esc).join(" · ")}</p></div>`;
+}
+
+function docketBlock() {
+  const at = state ? state.nomineeIdx : -1;
+  return `<div class="card"><h3>The docket</h3><ol class="docket">${nominees.map((c, k) =>
+    `<li class="${k < at ? "past" : k === at ? "now" : ""}"><i>${k + 1}</i><b>${esc(c.name)}</b></li>`).join("")}</ol>` +
+    '<p class="fine">Scored one at a time, in this order, under the policy on this page.</p></div>';
+}
+
+function pickerBlock() {
+  const row = (d, checked) => `<label><input type="checkbox" class="pick" data-key="${esc(d.key)}"${checked ? " checked" : ""}> ${esc(d.name)}</label>`;
+  const custom = customNominees.map((d, k) =>
+    `<label><input type="checkbox" checked disabled> ${esc(d.name)} <small>added</small><button type="button" class="x" data-custom="${k}" title="remove">×</button></label>`).join("");
+  const full = chosenDocket().length >= MAX_NOMINEES;
+  return `<div class="card"><h3>The docket</h3><div class="picker">${DEFAULT_NOMINEES.map((d) => row(d, pickedKeys.has(d.key))).join("")}` +
+    `<p class="fine">Spares, if the room is fast</p>${SPARE_NOMINEES.map((d) => row(d, pickedKeys.has(d.key))).join("")}${custom}</div>` +
+    (full ? `<p class="fine">The docket is full at ${MAX_NOMINEES} nominees.</p>` :
+      '<div class="row"><input type="text" id="nn" placeholder="Add a nominee" maxlength="40"><input type="text" id="nb" placeholder="One line about it" maxlength="160"><button class="ghost" id="nAdd">Add</button></div>') +
+    '<p class="fine">The docket is fixed when the jury is summoned.</p></div>';
+}
+
+function wirePicker() {
+  for (const box of document.querySelectorAll(".pick")) {
+    box.addEventListener("change", () => {
+      if (box.checked) pickedKeys.add(box.dataset.key);
+      else pickedKeys.delete(box.dataset.key);
+      render();
+    });
+  }
+  for (const btn of document.querySelectorAll("[data-custom]")) {
+    btn.addEventListener("click", () => {
+      customNominees = customNominees.filter((_, k) => k !== +btn.dataset.custom);
+      render();
+    });
+  }
+  const add = document.getElementById("nAdd");
+  if (add) add.addEventListener("click", () => {
+    const nm = document.getElementById("nn");
+    const bl = document.getElementById("nb");
+    const name = (nm.value || "").trim().slice(0, MAX_CUSTOM_NAME_LENGTH);
+    if (!name) return nm.focus();
+    customNominees = customNominees.concat([{ key: `custom-${customNominees.length + 1}`, name, blurb: (bl.value || "").trim().slice(0, MAX_CUSTOM_BLURB_LENGTH), note: "" }]);
+    nm.value = "";
+    bl.value = "";
+    render();
+  });
+}
+
+function nomineePreview() {
+  const c = nomineeDef();
+  return `<div class="card"><h3>Next before the jury · ${state.nomineeIdx + 1} of ${nominees.length}</h3><h2>${esc(c.name)}</h2><p class="fine">${esc(c.blurb)}</p>` +
+    `<div class="rule"><b>Read the policy now</b>Once the jury is opened you have ${COMMIT_DURATION_S} seconds to score.</div></div>`;
+}
+
+function nomineeBlock(c) {
+  return `<div class="card subject"><div class="nomineehead"><h3>Before the jury · ${state.nomineeIdx + 1} of ${nominees.length}</h3></div><h1 class="subject-name">${esc(c.name)}</h1><p class="subject-blurb">${esc(c.blurb)}</p></div>`;
+}
+
+function playersBlock(markSealed, removable) {
+  if (!players.length) return "";
+  const bk = book();
+  const c = cur();
+  return `<div class="players">${players.map((p) => {
+    const play = markSealed && c ? c.plays.find((x) => x.pid === p.pid) : null;
+    const sealed = !!(play && play.sealed && !play.recused);
+    const changed = !!(play && play.sealed && play.resealed && !play.recused);
+    const out = !!(play && play.recused);
+    const d = bk.last[p.pid];
+    const dd = typeof d === "number" && d !== 0 ? `<span class="${d > 0 ? "up" : "down"}">${signed(d)}</span>` : "";
+    const x = removable && p.pid !== myPid ? `<button type="button" class="x seat-x" data-pid="${esc(p.pid)}" title="remove this seat">×</button>` : "";
+    return `<span class="chip${p.pid === myPid ? " me" : ""}${sealed ? " done" : ""}${out ? " out" : ""}">${esc(p.name)}${changed ? '<span class="rs" title="changed a sealed score">↻</span>' : ""}<span class="bal">${signed(bk.balance[p.pid] || 0)}</span>${dd}${x}</span>`;
+  }).join("")}</div>`;
+}
+
+function seatedBlock(markSealed, removable) {
+  return players.length ? `<div class="card">${playersBlock(markSealed, removable)}</div>` : "";
+}
+
+function wireSeats() {
+  for (const btn of document.querySelectorAll(".seat-x")) btn.addEventListener("click", () => removeSeat(btn.dataset.pid));
+}
+
+function hostBar(inner) {
+  if (!isHost()) {
+    const confirm = pending === "take" ? '<button class="danger" id="cTake">Confirm: take over hosting</button><button class="ghost" id="cX">Cancel</button>' : '<button class="ghost" id="takeover">Take over</button>';
+    return `<div class="hostbar"><h3>${esc(hostName())} is running this</h3><div class="row">${confirm}</div></div>`;
+  }
+  return `<div class="hostbar"><h3>You are running this</h3><div class="row">${inner}</div></div>`;
+}
+
+function resetControls() {
+  if (busy) return '<span class="fine">working…</span>';
+  const confirm = { end: ["cEnd", "Confirm: end the game"], new: ["cNew", "Confirm: new game"], wipe: ["cWipe", "Confirm: delete everything in this room"] }[pending];
+  if (confirm) return `<button class="danger" id="${confirm[0]}">${confirm[1]}</button><button class="ghost" id="cX">Cancel</button>`;
+  return `${state.phase !== GAME_PHASE.ENDED ? '<button class="ghost" id="bEnd">End the game</button>' : ""}<button class="ghost" id="bNew">New game</button><button class="ghost" id="bWipe">Wipe all</button>`;
+}
+
+function console_() {
+  if (!state || !isHost()) return "";
+  return `<div class="console"><span class="ck">Host console</span><button class="ghost" id="pSw">Proofs: ${proofsOpen() ? "on screen" : "behind a button"}</button>${resetControls()}</div>`;
+}
+
+function wireHost() {
+  const handlers = {
+    takeover: () => { pending = "take"; render(); },
+    cTake: takeOver,
+    bEnd: () => { pending = "end"; render(); },
+    cEnd: endGame,
+    bNew: () => { pending = "new"; render(); },
+    cNew: newGame,
+    bWipe: () => { pending = "wipe"; render(); },
+    cWipe: wipeAll,
+    cX: () => { pending = null; render(); },
+    pSw: switchProofs,
+  };
+  for (const [id, fn] of Object.entries(handlers)) {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("click", fn);
+  }
+}
+
+function revealGate() {
+  const cc = cur() || { plays: [] };
+  const left = secondsLeft();
+  const seated = new Set(meta(state.nomineeIdx).seated || []);
+  const relevant = cc.plays.filter((play) => seated.has(play.pid));
+  const nSealed = relevant.filter((p) => p.sealed && !p.recused).length;
+  const nRecused = relevant.filter((p) => p.recused).length;
+  const unsealed = Math.max(0, seated.size - nSealed - nRecused);
+  const why = unsealed === 0 ? "everyone has sealed or recused" : left === null ? "" : left === 0 ? `time is up, ${unsealed} did not seal` : `${unsealed} still sealing · ${left}s`;
+  return { can: unsealed === 0 || left === null || left === 0, why, left, nSealed, nRecused };
+}
+
+let ticker = null;
+function tickCommit() {
+  const g = revealGate();
+  setStatus();
+  const b = document.getElementById("toReveal");
+  if (b) b.disabled = !g.can;
+  const w = document.getElementById("why");
+  if (w) w.textContent = g.why;
+  if (!g.left) tick(false);
+}
+function tick(on) {
+  if (on && !ticker) ticker = setInterval(tickCommit, MILLISECONDS_PER_SECOND);
+  else if (!on && ticker) {
+    clearInterval(ticker);
+    ticker = null;
+  }
+}
+
+let dragging = false;
+let redrawDeferred = false;
+app.addEventListener("pointerdown", (e) => { if (e.target && e.target.type === "range") dragging = true; });
+function dragEnd() {
+  if (!dragging) return;
+  dragging = false;
+  if (redrawDeferred) {
+    redrawDeferred = false;
+    render();
+  }
+}
+window.addEventListener("pointerup", dragEnd);
+window.addEventListener("pointercancel", dragEnd);
+window.addEventListener("blur", dragEnd);
+window.addEventListener("storage", (event) => {
+  if (event.key === null || event.key.startsWith("cg_")) render();
+});
+window.addEventListener("pagehide", () => { tick(false); if (db) db.close(); });
+window.addEventListener("pageshow", (event) => { if (event.persisted) location.reload(); });
+
+function keepInputs(draw) {
+  const typed = {};
+  const focused = document.activeElement;
+  const fid = focused && focused.id;
+  let sel = null;
+  for (const i of app.querySelectorAll("input[type=text]")) if (i.id) typed[i.id] = i.value;
+  if (fid && focused.tagName === "INPUT" && focused.type === "text") sel = [focused.selectionStart, focused.selectionEnd];
+  draw();
+  for (const [id, value] of Object.entries(typed)) {
+    const e = document.getElementById(id);
+    if (e && e.value !== value) e.value = value;
+  }
+  if (!fid) return;
+  const f = document.getElementById(fid);
+  if (!f) return;
+  if (f !== document.activeElement) f.focus({ preventScroll: true });
+  if (sel && f.type === "text") {
+    try { f.setSelectionRange(sel[0], sel[1]); } catch {  }
+  }
+}
+
+function render() {
+  if (dragging) {
+    redrawDeferred = true;
+    return;
+  }
+  tick(false);
+  setStatus();
+  keepInputs(() => {
+    if (!storageOk) return renderStorageBlocked();
+    if (!roomCode) return renderNoRoom();
+    if (!seatedOk) return renderConnecting();
+    if (!stateLoaded) return renderConnecting();
+    if (!state) return renderSummon();
+    if (!rosterLoaded) return renderWaiting();
+    if (!me()) return renderJoin();
+    if (!metaLoaded) return renderWaiting();
+    try { screen(); } catch (e) { renderBroken(e); }
+  });
+  openMySeals();
+}
+
+function loadedFor(i) {
+  const c = byNominee[i];
+  return !!(c && c.playsLoaded && c.leaksLoaded);
+}
+
+function screen() {
+  if (!cur() || !nomineeDef()) return renderRecovery();
+  if (!loadedFor(state.nomineeIdx) && state.phase !== GAME_PHASE.LOBBY) return renderWaiting();
+  if (byNominee.some((_, i) => C.isGraded(state, i, nominees.length) && !loadedFor(i))) return renderWaiting();
+  if (state.phase === GAME_PHASE.COMMIT) return renderCommit();
+  if (state.phase === GAME_PHASE.REVEAL) return renderReveal();
+  if (state.phase === GAME_PHASE.GRADED) return renderResults();
+  if (state.phase === GAME_PHASE.ENDED) return renderDone();
+  return renderLobby();
+}
+
+function renderBroken(e) {
+  app.innerHTML = `<div class="card"><h2>This screen could not be drawn</h2><p class="fine">${esc(String(e && e.message ? e.message : e))}</p><div class="row"><button id="again">Reload</button></div></div>${console_()}`;
+  document.getElementById("again").addEventListener("click", () => location.reload());
+  wireHost();
+}
+
+function renderRecovery() {
+  app.innerHTML = `${netBanner()}<div class="card"><h2>The docket and the game disagree</h2><p class="fine">This game points at a nominee the docket does not hold. The host can end it or start a new game.</p></div>${hostBar("")}${console_()}`;
+  wireHost();
+}
+
+function renderStorageBlocked() {
+  app.innerHTML = '<div class="card"><h2>This browser blocks site storage</h2><p class="fine">The game keeps your seat and the salt of your sealed score on your own device, and this window will not hold them. Open the room address in a normal window, not a private one, or in another browser.</p></div>';
+}
+
+function renderNoRoom() {
+  app.innerHTML = `<div class="card"><h2>No room in this address</h2><p class="fine">Open the room address you were given. It looks like ${esc(location.origin + roomPath(SESSION.roomCode))}.</p></div>`;
+}
+
+function renderConnecting() {
+  const text = seatError ? `The room refused this seat: ${seatError}.` : db && db.status() === "reconnecting" ? "Reconnecting to the room…" : "Connecting to the room…";
+  app.innerHTML = `<div class="card"><h2>${seatError ? "Could not take a seat" : "One moment"}</h2><p class="fine">${esc(text)}</p>${seatError ? '<div class="row"><button id="again">Reload</button></div>' : ""}</div>`;
+  const b = document.getElementById("again");
+  if (b) b.addEventListener("click", () => location.reload());
+}
+
+function renderWaiting() {
+  app.innerHTML = `${netBanner()}<div class="card"><h2>Fetching the jury…</h2><p class="fine">Waiting for the room.</p></div>`;
+}
+
+function nameBox() {
+  return `<input type="text" id="nm" placeholder="Your name" maxlength="${MAX_NAME_LENGTH}" autocomplete="off" value="${esc(myName)}">`;
+}
+
+function readName() {
+  const v = (document.getElementById("nm").value || "").trim().slice(0, MAX_NAME_LENGTH);
+  if (v) {
+    myName = v;
+    LS(STORAGE_KEYS.name, v);
+  }
+  return v;
+}
+
+function focusNameOnce() {
+  if (joinFocused) return;
+  joinFocused = true;
+  const i = document.getElementById("nm");
+  if (i) {
+    i.focus();
+    i.select();
+  }
+}
+
+function renderSummon() {
+  app.innerHTML = `${netBanner()}<div class="card summonbar"><div class="stack"><h1>No jury summoned</h1><p class="fine">One jury at a time. Whoever summons it hosts it; everyone else takes a seat once it exists.</p></div>` +
+    `<div class="row">${nameBox()}<button id="summon"${busy || !chosenDocket().length ? " disabled" : ""}>Summon a jury and host it</button></div></div>` +
+    (seatMsg ? banner("amber", "Note", seatMsg) : "") + pickerBlock() + lawBlock();
+  focusNameOnce();
+  document.getElementById("summon").addEventListener("click", () => { const name = readName(); if (name) summonJury(name); });
+  wirePicker();
+}
+
+function renderJoin() {
+  app.innerHTML = `${netBanner()}<div class="split"><div class="stack">${lawBlock()}</div><div class="stack">` +
+    `<div class="card"><h1>Coherence game</h1><p class="fine">${nominees.length} nominees from the infrastructure research runs on, scored under this policy. Sealed scores, opened together.</p>` +
+    '<div class="rule"><b>Graded against the jury, not against the truth</b>The nearer the jury’s centre you land, the larger your share of the round’s pot. The farther beyond the band, the more of your own stake you forfeit. The only thing all of you share is the policy.</div>' +
+    `<div class="strip"><div><b>${n(GAME_ANTE)}</b><span>stake per nominee</span></div><div class="g"><b>+</b><span>near the jury</span></div><div class="r"><b>−</b><span>far from it</span></div></div>` +
+    (myName ? '<p class="fine">A jury is summoned. Take your seat.</p>' : "") +
+    `<div class="row">${nameBox()}<button id="seat">Take a seat</button></div></div>${docketBlock()}${seatedBlock(false, false)}</div></div>`;
+  focusNameOnce();
+  const go = () => { const name = readName(); if (name) takeSeat(name); };
+  document.getElementById("seat").addEventListener("click", go);
+  document.getElementById("nm").addEventListener("keydown", (e) => { if (e.key === "Enter") go(); });
+}
+
+function renderLobby() {
+  app.innerHTML = `${netBanner()}<div class="split"><div class="stack">${lawBlock()}</div><div class="stack">${nomineePreview()}${docketBlock()}${seatedBlock(false, isHost())}` +
+    hostBar(`<button id="open">Open ${esc(nomineeDef().name)}</button>`) + "</div></div>" + console_();
+  wireHost();
+  wireSeats();
+  const b = document.getElementById("open");
+  if (b) b.addEventListener("click", openNominee);
+}
+
+function blocInstruction() {
+  const c = nomineeDef();
+  if (!c.bloc || !state || !inBloc(myPid, state.seed, state.blocFraction)) return "";
+  return `<div class="banner bad"><b>Private: only you see this</b>You are in the bloc. <strong>Score ${esc(c.blocScore)}.</strong> If challenged, say ${esc(c.blocCover)}. That reading is excluded by the policy, but nobody can see <em>why</em> you scored, only what you scored. If enough of you comply the centre moves toward the bloc and the honest jurors forfeit to you.</div>` +
+    `<div class="banner amber"><b>But you cannot verify each other</b>The only way to prove you complied is to hand someone your sealed score. Whoever holds it can report you and cost you ${n(LEAK_PENALTY)} of your stake, keeping ${n(LEAK_BOUNTY)}. And it proves nothing anyway: either of you can replace a seal until the scoring closes.</div>`;
+}
+
+function payoffShape() {
+  return '<div class="payoff"><div class="pb"><span class="pc"></span></div><div class="pl"><span>forfeit more</span><span class="mid">paid most at the centre</span><span>forfeit more</span></div><div class="pw">the centre is wherever the jury lands, and no seal is open yet</div></div>';
+}
+
+function renderCommit() {
+  const c = nomineeDef();
+  const cc = cur();
+  const mine = myPlay();
+  const seatedHere = seatedForCurrentNominee();
+  const recused = !!(mine && mine.recused);
+  const sealed = !!(mine && mine.hash) && !recused && !reseal;
+  const gate = revealGate();
+  const nChanged = cc.plays.filter((p) => p.sealed && p.resealed && !p.recused).length;
+  const scorer = !seatedHere
+    ? '<div class="banner amber"><b>You joined after this nominee opened</b>You will take part from the next nominee. Nothing is at stake for you here.</div>'
+    : recused
+      ? `<div class="banner amber"><b>Recused</b>You have declared you do not know enough about ${esc(c.name)} to score it. No stake, no share, no fine for silence; a leak still costs.</div><div class="row"><button class="ghost" id="unrec">Take my seat back</button></div>`
+      : sealed
+      ? '<div class="banner good"><b>Sealed</b>Nobody can see your number, including the host. You can replace it until the scoring closes.</div><div class="row"><button class="ghost" id="chg">Change my score</button><button class="ghost" id="rec">Recuse myself</button></div>'
+      : '<div class="rule"><b>Graded against the jury, not against the truth</b>The nearer the jury’s mean you land, the larger your share of the round’s pot. The farther beyond the band, the more of your own stake you forfeit; two bands out is all of it. The only thing all of you share is the policy.</div>' +
+        `<div class="bigscore" id="out">${fmtScore(myScore)}</div><input type="range" id="rng" min="${SCORE_MIN}" max="${SCORE_MAX}" step="1" value="${myScore}">` +
+        `<div class="ends"><span>0.00 ${esc(POLICY.anchors[0][1])}</span><span>1.00 ${esc(POLICY.anchors[POLICY.anchors.length - 1][1])}</span></div>${payoffShape()}` +
+        '<div class="row"><button id="seal">Seal and submit</button><button class="ghost" id="rec">I do not know enough</button></div>';
+  app.innerHTML = `${netBanner()}<div class="split"><div class="stack">${nomineeBlock(c)}${lawBlock()}</div><div class="stack">${seatedHere ? blocInstruction() : ""}` +
+    `<div class="card"><div class="strip"><div><b>${n(GAME_ANTE)}</b><span>${seatedHere ? "your stake" : "seated juror’s stake"}</span></div><div><b>${n(C.ROUND_REWARD)}</b><span>round reward, forfeits join it</span></div>` +
+    `<div><b>${gate.nSealed}/${(meta(state.nomineeIdx).seated || []).length - gate.nRecused}</b><span>sealed</span></div>${gate.nRecused ? `<div><b>${gate.nRecused}</b><span>recused</span></div>` : ""}${nChanged ? `<div><b>${nChanged}</b><span>changed a seal</span></div>` : ""}</div>${scorer}</div>` +
+    (seatedHere ? leakPanel(sealed && !recused) : "") + seatedBlock(true, false) +
+    hostBar(`<button id="toReveal"${gate.can ? "" : " disabled"}>Close and reveal</button><span class="fine" id="why">${esc(gate.why)}</span>`) + "</div></div>" + console_();
+  wireHost();
+  tick(gate.left !== null && gate.left > 0);
+  const rc = document.getElementById("rec");
+  if (rc) rc.addEventListener("click", recuse);
+  const un = document.getElementById("unrec");
+  if (un) un.addEventListener("click", unrecuse);
+  if (seatedHere && !sealed && !recused) {
+    const rng = document.getElementById("rng");
+    const out = document.getElementById("out");
+    rng.addEventListener("input", () => { myScore = +rng.value; out.textContent = fmtScore(myScore); });
+    document.getElementById("seal").addEventListener("click", sealScore);
+  } else {
+    const ch = document.getElementById("chg");
+    if (ch) ch.addEventListener("click", () => {
+      const st = storedSeal(state.nomineeIdx, mine);
+      if (st) myScore = +st.split(":")[0];
+      reseal = true;
+      showProof = false;
+      reportMsg = null;
+      render();
+    });
+  }
+  wireLeak();
+  const b = document.getElementById("toReveal");
+  if (b) b.addEventListener("click", closeScoring);
+}
+
+function leakPanel(sealed) {
+  const cc = cur();
+  const stored = sealed ? storedSeal(state.nomineeIdx, myPlay()) : null;
+  const already = cc.leaks.find((l) => l.leakerPid === myPid);
+  return '<div class="card"><h3>Anti-pre-revelation</h3><p class="fine">Opening your sealed score to anyone before the jury opens together is pre-revelation. Whoever you show can turn it in.</p>' +
+    `<div class="strip"><div class="r"><b>−${n(LEAK_PENALTY)}</b><span>if reported</span></div><div class="g"><b>+${n(LEAK_BOUNTY)}</b><span>if you report</span></div><div><b>${cc.leaks.length}</b><span>reported</span></div></div>` +
+    (already ? `<div class="banner bad"><b>You were reported</b>${esc(pname(already.reporterPid))} holds your proof. −${n(LEAK_PENALTY)}.</div>` : "") +
+    (stored ? `<div class="proofwrap"><span class="proof-k">your proof · anyone who reads it can report you</span>${proofsOpen() || showProof ? `<div class="proof">${esc(proofText(+stored.split(":")[0], stored.split(":").slice(1).join(":")))}</div>` : ""}` +
+      (proofsOpen() ? "" : `<div class="row"><button class="ghost" id="tp">${showProof ? "Hide my proof" : "Show my proof"}</button></div>`) +
+      '<span class="fine">It proves what you sealed, not what you will open, and stays reportable even after you change it.</span></div>' : "") +
+    '<div class="row"><input type="text" id="rep" placeholder="The proof you heard"><button class="warn" id="repBtn">Report</button></div>' +
+    (reportMsg ? `<div class="banner ${reportMsg.kind}">${esc(reportMsg.text)}</div>` : "") + "</div>";
+}
+
+function wireLeak() {
+  const t = document.getElementById("tp");
+  if (t) t.addEventListener("click", () => { showProof = !showProof; render(); });
+  const b = document.getElementById("repBtn");
+  if (b) b.addEventListener("click", () => reportProof((document.getElementById("rep").value || "").trim()));
+}
+
+function renderReveal() {
+  const cc = cur();
+  const mine = myPlay();
+  const scoring = cc.plays.filter((p) => p.sealed && !p.recused);
+  const revealed = scoring.filter((p) => p.revealed);
+  const recused = new Set(cc.plays.filter((p) => p.recused).map((p) => p.pid));
+  const opened = new Set(revealed.map((p) => p.pid));
+  const waiting = (meta(state.nomineeIdx).seated || []).filter((pid) => !recused.has(pid) && !opened.has(pid)).map(pname);
+  const nRecused = cc.plays.filter((p) => p.recused).length;
+  const sealedByMe = !!(mine && mine.hash && !mine.recused);
+  const seatedHere = seatedForCurrentNominee();
+  const lost = sealedByMe && !mine.revealed && !storedSeal(state.nomineeIdx, mine);
+  const unsealedNote = sealedByMe || (mine && mine.recused) ? "" : seatedHere ? banner("bad", "You did not seal", `−${n(GAME_ANTE)}.`) : banner("amber", "You joined after this one opened", "Nothing at stake for you here.");
+  app.innerHTML = `${netBanner()}<div class="card"><h1>Opening</h1><div class="strip"><div><b>${revealed.length}/${scoring.length}</b><span>revealed</span></div><div><b>${cc.leaks.length}</b><span>reported</span></div><div><b>${nRecused || players.length}</b><span>${nRecused ? "recused" : "seats"}</span></div></div>` +
+    (mine && mine.recused ? banner("amber", "Recused", "You sat this one out. Nothing to open, nothing at stake for silence.") : "") + unsealedNote +
+    (lost ? banner("bad", "Salt missing", "The salt of your sealed score is not on this device, so it cannot be opened here. The jury counts you as not revealing.") : "") +
+    (waiting.length ? `<p class="unrevealed">Not yet revealed: ${esc(waiting.join(", "))}</p>` : '<p class="fine">Everyone has revealed.</p>') + "</div>" +
+    `<div class="split"><div class="stack">${seatedBlock(false, false)}</div><div class="stack">${hostBar('<button id="toRes">Grade</button>')}</div></div>${console_()}`;
+  wireHost();
+  const b = document.getElementById("toRes");
+  if (b) b.addEventListener("click", gradeNominee);
+}
+
+function pinLeft(score) {
+  return PIN_INSET_PCT + score * (PERCENT_SCALE - 2 * PIN_INSET_PCT);
+}
+
+function trackHtml(g, valid) {
+  const height = Math.max(TRACK_MIN_HEIGHT, valid.length * TRACK_ROW_HEIGHT);
+  const ids = valid.map((v) => v.pid);
+  const pins = g.graded.map((gr) => {
+    const i = ids.indexOf(gr.pid);
+    const top = TRACK_ROW_HEIGHT / 2 + ((i + 0.5) / Math.max(valid.length, 1)) * (height - TRACK_ROW_HEIGHT);
+    const fill = gr.within
+      ? `color-mix(in srgb, var(--upheld) ${(PIN_COLOR_MIN_PCT + gr.closeness * PIN_COLOR_SPAN_PCT).toFixed(1)}%, var(--paper))`
+      : `color-mix(in srgb, var(--charge) ${(PIN_COLOR_MIN_PCT + gr.penalty * PIN_COLOR_SPAN_PCT).toFixed(1)}%, var(--paper))`;
+    return `<span class="pin${gr.score >= LABEL_FLIP ? " flip" : ""}" style="left:${pinLeft(gr.score).toFixed(2)}%;top:${top.toFixed(1)}px"><i style="background:${fill}"></i><span>${esc(pname(gr.pid))}</span></span>`;
+  }).join("");
+  const PEAK = "color-mix(in srgb, var(--upheld) 34%, transparent)";
+  const CAP = "color-mix(in srgb, var(--charge) 28%, transparent)";
+  const at = (x) => pinLeft(C.clamp01(x)).toFixed(1);
+  const grad = `linear-gradient(90deg,${CAP} ${at(g.lo - g.half)}%,transparent ${at(g.lo)}%,${PEAK} ${at(g.centre)}%,transparent ${at(g.hi)}%,${CAP} ${at(g.hi + g.half)}%)`;
+  const total = (x) => (x > 0 && x < 1 ? `<span class="track__total" style="left:${at(x)}%"></span>` : "");
+  return `<div class="track" style="height:${height}px"><span class="track__penalty" style="background:${grad}"></span><span class="track__band" style="left:${at(g.lo)}%;width:${Math.max(0, pinLeft(C.clamp01(g.hi)) - pinLeft(C.clamp01(g.lo))).toFixed(1)}%"></span>${total(g.lo - g.half)}${total(g.hi + g.half)}<span class="track__centre" style="left:${at(g.centre)}%"></span>${pins}</div>` +
+    '<div class="axis"><span>0.00</span><span>dotted line: total forfeit from here</span><span>1.00</span></div>';
+}
+
+function ranked() {
+  const bk = book();
+  const compareText = (a, b) => a === b ? 0 : a < b ? -1 : 1;
+  return players.slice().sort((a, b) => (bk.balance[b.pid] || 0) - (bk.balance[a.pid] || 0) || compareText(a.name, b.name) || compareText(a.pid, b.pid));
+}
+
+function standingsHtml() {
+  const bk = book();
+  return `<table class="standings"><tbody>${ranked().map((pl, i, all) => {
+    const d = bk.last[pl.pid];
+    const bal = bk.balance[pl.pid] || 0;
+    const tied = i > 0 && (bk.balance[all[i - 1].pid] || 0) === bal;
+    return `<tr class="${pl.pid === myPid ? "me" : ""}"><td class="num" style="width:2rem;color:var(--muted)">${tied ? "=" : i + 1}</td><td>${esc(pl.name)}</td><td class="num ${typeof d !== "number" ? "" : d >= 0 ? "up" : "down"}">${typeof d !== "number" ? "" : signed(d)}</td><td class="num"><b>${signed(bal)}</b></td></tr>`;
+  }).join("")}</tbody></table>`;
+}
+
+function blocBanner(c, r, g) {
+  const assigned = r.valid.map((v) => v.pid).filter((pid) => inBloc(pid, state.seed, state.blocFraction));
+  const target = Number.parseFloat(c.blocScore);
+  const complied = r.valid.filter((p) => assigned.includes(p.pid) && Math.abs(p.score / SCORE_MAX - target) <= BLOC_TOLERANCE).map((p) => p.pid);
+  const otherOut = g.graded.filter((x) => !x.within && !complied.includes(x.pid)).length;
+  const blocOut = g.graded.filter((x) => !x.within && complied.includes(x.pid)).length;
+  const blocShare = g.graded.filter((x) => x.within && complied.includes(x.pid)).reduce((s, x) => s + x.share, 0);
+  const share = Math.round((assigned.length / Math.max(r.valid.length, 1)) * PERCENT_SCALE);
+  const head = `Bloc assigned to ${share}% of the jury · ${complied.length} of ${assigned.length} complied`;
+  if (!complied.length) return banner("good", head, "Nobody followed the instruction. The attack never happened.");
+  if (blocOut > 0 && otherOut === 0) return banner("good", head, "The bloc sat outside the band and paid for it.");
+  if (otherOut > 0) return banner("bad", head, `${otherOut} other juror${otherOut === 1 ? "" : "s"} and ${blocOut} following the bloc instruction forfeited; ${complied.length - blocOut} following the instruction stayed inside the band. A bloc can move a mean. The full design uses random stake-weighted draws and appeals to larger juries; neither is performed in this game.`);
+  return banner("amber", head, `The bloc landed inside the band and took ${Math.round(blocShare * PERCENT_SCALE)}% of the pot. It moved the centre without costing anyone a forfeit.`);
+}
+
+function nextBtn() {
+  return `<button id="next">${state.nomineeIdx + 1 < nominees.length ? "Next nominee" : "Finish"}</button>`;
+}
+
+function wireNext() {
+  const b = document.getElementById("next");
+  if (b) b.addEventListener("click", nextNominee);
+}
+
+function lateRevealBanner() {
+  const late = byNominee.flatMap((entry, i) => {
+    const mine = entry.plays.find((play) => play.pid === myPid);
+    return C.isGraded(state, i, nominees.length) && mine && mine.revealed && !C.countsAsRevealed(mine, entry.closedAt) ? [nominees[i].name] : [];
+  });
+  return late.length ? banner("bad", "Opened after grading", `Your seal for ${late.join(", ")} opened after grading and does not count. The ledger treats it as no reveal.`) : "";
+}
+
+function renderResults() {
+  const c = nomineeDef();
+  const bk = book();
+  const r = bk.results[state.nomineeIdx];
+  if (!r || !r.grading) {
+    const leakNote = r && cur().leaks.length ? ` Fines and bounties for pre-revelation still apply: ${cur().leaks.map((l) => `${esc(pname(l.leakerPid))} → ${esc(pname(l.reporterPid))}`).join(", ")}.` : "";
+    app.innerHTML = `${netBanner()}<div class="card"><h2>Void</h2><p class="fine">Nobody revealed: a quorum failure. Nobody is charged for silence.${leakNote}</p></div>${hostBar(nextBtn())}<div class="card"><h3>Standings</h3>${standingsHtml()}</div>${console_()}`;
+    wireHost();
+    wireNext();
+    return;
+  }
+  const g = r.grading;
+  const myNet = bk.last[myPid];
+  const mine = g.graded.find((x) => x.pid === myPid);
+  const leaks = cur().leaks;
+  const wasLeaked = leaks.some((l) => l.leakerPid === myPid);
+  const bounty = leaks.filter((l) => l.reporterPid === myPid).length;
+  const up = (myNet || 0) >= 0;
+  const label = !mine ? (r.recused.includes(myPid) ? "recused" : "no reveal") : mine.within ? "coherent" : "outlier";
+  const verdict = typeof myNet === "number"
+    ? `<div class="verdict ${up ? "win" : "lose"}"><span class="v-amt">${signed(myNet)}</span><span class="v-side"><span class="v-label">${label}${wasLeaked ? " · reported" : ""}${bounty ? " · bounty" : ""}</span><span class="v-stats">${mine ? `<span>you <b>${mine.score.toFixed(2)}</b></span>` : ""}<span>mean <b>${g.centre.toFixed(2)}</b></span><span>band <b>±${g.half.toFixed(3)}</b></span>${mine ? `<span>off by <b>${mine.distance.toFixed(3)}</b> · ${mine.bands.toFixed(1)} bands</span>` : ""}${mine && mine.within ? `<span>share of pot <b>${(mine.share * PERCENT_SCALE).toFixed(1)}%</b></span>` : ""}${mine && !mine.within ? `<span>forfeit <b>${(mine.penalty * PERCENT_SCALE).toFixed(0)}%</b> of stake</span>` : ""}</span></span></div>`
+    : "";
+  const leakBan = leaks.length ? banner("amber", `${leaks.length} reported for pre-revelation`, leaks.map((l) => `${pname(l.leakerPid)} → ${pname(l.reporterPid)}`).join(", ")) : "";
+  app.innerHTML = netBanner() + lateRevealBanner() + verdict + (c.bloc ? blocBanner(c, r, g) : "") + leakBan +
+    `<div class="split"><div class="stack"><div class="card">${trackHtml(g, r.valid)}` +
+    `<div class="strip"><div class="g"><b>${g.coherentCount}</b><span>paid</span></div><div class="r"><b>${g.outlierCount}</b><span>forfeiting</span></div><div><b>${n(g.pot)}</b><span>pot: ${n(C.ROUND_REWARD)} reward + forfeits</span></div></div>` +
+    '<table><thead><tr><th>Juror</th><th class="num">Score</th><th class="num">Off by</th><th class="num">Grade</th><th class="num">Net</th></tr></thead><tbody>' +
+    g.graded.slice().sort((a, b) => a.score - b.score).map((x) => {
+      const net = r.delta[x.pid] || 0;
+      return `<tr class="${x.pid === myPid ? "me" : ""}"><td>${esc(pname(x.pid))}</td><td class="num">${x.score.toFixed(2)}</td><td class="num">${x.distance.toFixed(3)} · ${x.bands.toFixed(1)}×</td><td class="num ${x.within ? "up" : "down"}">${x.within ? `${(x.share * PERCENT_SCALE).toFixed(1)}% of pot` : `${(x.penalty * PERCENT_SCALE).toFixed(0)}% of stake`}</td><td class="num ${net >= 0 ? "up" : "down"}">${signed(net)}</td></tr>`;
+    }).join("") + "</tbody></table>" +
+    (r.absent.length ? `<p class="fine">${r.absent.map((pid) => esc(pname(pid))).join(", ")} did not reveal in time: −${n(GAME_ANTE)} each.</p>` : "") +
+    (r.recused.length ? `<p class="fine">${r.recused.map((pid) => esc(pname(pid))).join(", ")} recused: no stake, no share, no fine for silence.</p>` : "") +
+    (c.note ? `<p class="fine">${esc(c.note)}</p>` : "") +
+    `<p class="fine">Off by is measured in bands of ±${g.half.toFixed(3)} (${C.K} × the jury’s spread${g.mad > g.madRaw ? `, floored at ${g.mad.toFixed(2)}` : ` of ${g.madRaw.toFixed(3)}`}). ${C.TOTAL_FORFEIT_BANDS} bands out is a total forfeit. Inside the band this game pays by closeness to the mean.</p>` +
+    `</div></div><div class="stack"><div class="card"><h3>Standings</h3>${standingsHtml()}</div>${hostBar(nextBtn())}</div></div>${console_()}`;
+  wireHost();
+  wireNext();
+}
+
+function renderDone() {
+  const bk = book();
+  const through = typeof state.gradedThrough === "number" ? state.gradedThrough : nominees.length;
+  const scored = nominees.slice(0, through).map((c) => c.name);
+  app.innerHTML = `${netBanner()}${lateRevealBanner()}<div class="card"><h3>Final standing · ${through} of ${nominees.length} nominees scored</h3><h1>The jury’s final standings</h1><p class="fine">${esc(scored.join(" · "))}</p></div>` +
+    `<div class="board">${ranked().map((pl, i, order) => {
+      const bal = bk.balance[pl.pid] || 0;
+      const firstAtBalance = order.findIndex((other) => (bk.balance[other.pid] || 0) === bal);
+      const tied = order.some((other) => other.pid !== pl.pid && (bk.balance[other.pid] || 0) === bal);
+      const soleWinner = i === 0 && !tied && bal > 0;
+      return `<div class="seat${pl.pid === myPid ? " me" : ""}${soleWinner ? " first" : ""}"><span class="rank">${firstAtBalance + 1}${tied ? "=" : ""}</span><span class="who">${esc(pl.name)}</span><span class="amt ${bal > 0 ? "up" : bal < 0 ? "down" : ""}">${signed(bal)}</span></div>`;
+    }).join("")}</div>` +
+    '<div class="card"><p class="fine">Every balance here was derived from the sealed scores, the reveals and the reports, by every phone in the room, with the same arithmetic.</p>' +
+    `<div class="row"><a href="${MAILING_LIST_PATH}"><button class="ghost">Join the Decentralized Curation mailing list</button></a><a href="${HANDOUT_PATH}"><button class="ghost">The one-page summary</button></a></div></div>` +
+    hostBar("") + console_();
+  wireHost();
+}
+
+function bind(ep) {
+  if (subEpoch === ep) return;
+  for (const u of subs) {
+    try { u(); } catch {  }
+  }
+  subs = [];
+  subEpoch = ep;
+  players = [];
+  rosterLoaded = false;
+  metaLoaded = false;
+  nomineeMeta = [];
+  byNominee = nominees.map(() => ({ plays: [], leaks: [], playsLoaded: false, leaksLoaded: false }));
+  if (!ep) return;
+  subs.push(playersRef(ep).onSnapshot((s) => {
+    players = s.docs.map((d) => d.data()).sort((a, b) => (a.joinedAt || 0) - (b.joinedAt || 0));
+    rosterLoaded = true;
+    render();
+  }, fatal));
+  subs.push(nomineesCol(ep).onSnapshot((s) => {
+    nomineeMeta = [];
+    for (const d of s.docs) nomineeMeta[Number.parseInt(String(d.id).slice(ROOM_PATH.NOMINEE_PREFIX.length), 10)] = d.data();
+    byNominee.forEach((c, i) => {
+      const metadata = nomineeMeta[i] || {};
+      c.openedAt = metadata.openedAt;
+      c.closedAt = metadata.closedAt;
+      c.seated = metadata.seated;
+    });
+    metaLoaded = true;
+    render();
+  }, fatal));
+  nominees.forEach((_, i) => {
+    subs.push(playsRef(ep, i).onSnapshot((s) => { byNominee[i].plays = s.docs.map((d) => d.data()); byNominee[i].playsLoaded = true; render(); }, fatal));
+    subs.push(leaksRef(ep, i).onSnapshot((s) => { byNominee[i].leaks = s.docs.map((d) => d.data()); byNominee[i].leaksLoaded = true; render(); }, fatal));
+  });
+}
+
+function fatal(error) {
+  seatError = `a subscription failed (${error.message}); reload the page`;
+  seatedOk = false;
+  render();
+}
+
+let uiKey = null;
+let phaseKey = null;
+function resetUi() {
+  const key = state ? `${state.epoch}/${state.nomineeIdx}` : null;
+  const nextPhaseKey = state ? `${key}/${state.phase}` : null;
+  if (nextPhaseKey !== phaseKey) {
+    dragging = false;
+    redrawDeferred = false;
+    phaseKey = nextPhaseKey;
+    pending = null;
+  }
+  if (key === uiKey) return;
+  uiKey = key;
+  seatMsg = null;
+  joinFocused = false;
+  showProof = false;
+  reportMsg = null;
+  reseal = false;
+  myScore = NEUTRAL_SCORE;
+}
+
+async function takeSeatAtRoom() {
+  try {
+    await db.hello(myPid, mySecret);
+    seatedOk = true;
+    seatError = null;
+  } catch (error) {
+    seatError = error.message;
+  }
+  render();
+}
+
+function start() {
+  if (!storageOk || !roomCode) {
+    render();
+    return;
+  }
+  const scheme = location.protocol === "https:" ? "wss://" : "ws://";
+  db = connect(`${scheme}${location.host}${roomPath(roomCode, true)}`);
+  db.onStatus((status) => {
+    seatedOk = status === "open";
+    if (!seatedOk) {
+      stateLoaded = false;
+      rosterLoaded = false;
+      metaLoaded = false;
+      for (const nominee of byNominee) {
+        nominee.playsLoaded = false;
+        nominee.leaksLoaded = false;
+      }
+    }
+    render();
+  });
+  takeSeatAtRoom();
+  stateRef().onSnapshot((s) => {
+    stateLoaded = true;
+    state = liveGame(s);
+    nominees = state ? state.docket : [];
+    resetUi();
+    bind(state ? state.epoch : null);
+    render();
+  }, fatal);
+  render();
+}
+
+start();
+</script>
+</body>
+</html>

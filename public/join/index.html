@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Follow the project</title><link rel="icon" href="data:,"><link rel="stylesheet" href="/paper.css"><style>.signup{max-width:38rem;gap:1.2rem}.signup h1{font-size:clamp(2rem,5vw,3rem)}.signup form{display:grid;gap:1.2rem}.signup .card{padding:clamp(1rem,4vw,2rem);gap:1.3rem}.signup #send{justify-self:start}</style></head><body><main class="page signup"><header class="page-header"><a class="dc-brand" href="/" data-session="project"></a><a class="fine" href="/deck/">Session deck</a></header><article class="card"><h1>Follow <span data-session="project"></span></h1><p>Hear what comes next in the project, and how to run a jury in your own community.</p><form id="signup" novalidate><label class="form-field" for="name">Name<input type="text" id="name" name="name" autocomplete="name" required></label><label class="form-field" for="email">Email<input type="email" id="email" name="email" autocomplete="email" required></label><p class="fine">We keep your name and address to write to you about this project; nothing else.</p><p class="banner bad" id="feedback" role="alert" hidden></p><button type="submit" id="send">Join the mailing list</button></form><p class="banner good" id="thanks" role="status" hidden>Thank you. You are on the list.</p></article><footer class="page-footer fine" data-session="attribution"></footer></main><script type="module">
+import { SESSION } from "/session.js";
+import { SIGNUP_LIMITS } from "/protocol.js";
+for (const element of document.querySelectorAll("[data-session]")) element.textContent = SESSION[element.dataset.session];
+const REQUEST_TIMEOUT_MS = 10000;
+const CREATED = 201;
+const BAD_REQUEST = 400;
+const form = document.getElementById("signup");
+const name = document.getElementById("name");
+const email = document.getElementById("email");
+name.maxLength = SIGNUP_LIMITS.name;
+email.maxLength = SIGNUP_LIMITS.email;
+const send = document.getElementById("send");
+const feedback = document.getElementById("feedback");
+function failure(message, field) {
+  feedback.textContent = message;
+  feedback.hidden = false;
+  if (field) { field.setAttribute("aria-invalid", "true"); field.focus(); }
+}
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  feedback.hidden = true;
+  name.removeAttribute("aria-invalid");
+  email.removeAttribute("aria-invalid");
+  if (!name.value.trim()) { failure("Please enter your name.", name); return; }
+  if (name.value.trim().length > SIGNUP_LIMITS.name) { failure(`Use a name of at most ${SIGNUP_LIMITS.name} characters.`, name); return; }
+  if (!email.value.trim() || !email.validity.valid) { failure("That address does not look right.", email); return; }
+  send.disabled = true;
+  send.textContent = "Joining…";
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const response = await fetch("/api/signup", { method: "POST", signal: controller.signal, headers: { "content-type": "application/json" }, body: JSON.stringify({ name: name.value.trim(), email: email.value.trim() }) });
+    if (response.status === CREATED) { form.hidden = true; document.getElementById("thanks").hidden = false; }
+    else if (response.status === BAD_REQUEST) failure("That address does not look right.", email);
+    else failure("Could not reach the sign-up service. Try again in a moment.");
+  } catch {
+    failure("Could not reach the sign-up service. Try again in a moment.");
+  } finally {
+    clearTimeout(timeout);
+    send.disabled = false;
+    send.textContent = "Join the mailing list";
+  }
+});
+document.title = `Follow ${SESSION.project}`;
+</script></body></html>

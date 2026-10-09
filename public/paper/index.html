@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Paper jury calculator</title><link rel="icon" href="data:,"><link rel="stylesheet" href="/paper.css"><style>.rounds{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:1rem}.round{display:grid;gap:.7rem}.round textarea{min-height:8rem;line-height:1.6}.round h2{font-size:1.3rem}.round .fine{font-size:.68rem}.result{display:grid;gap:.8rem}.results{display:grid;gap:1.5rem}.result h2{font-size:1.35rem}.standings{max-width:36rem}#feedback{overflow-wrap:anywhere}.paper-title{font-size:clamp(2rem,5vw,3rem)}.round input{width:100%}.points{color:var(--muted);font:.75rem var(--mono)}</style></head><body><main class="page"><header class="page-header"><a href="/" class="dc-brand" data-session="project"></a><nav><a href="/deck/">Deck</a><a href="/paper/sheets.html">Print score sheets</a></nav></header><div class="card"><h1 class="paper-title">The paper jury</h1><p class="lede">Enter the opened scores. The same ledger as the live game grades the room.</p><p>One juror per line: <span class="points">Ada 0.62</span> or <span class="points">Ada 62</span>. Use <span class="points">Ada recuse</span> to record a recusal. A score of 1 means 1.00. Scores are rounded to the nearest hundredth.</p><p class="fine">Everyone named in any entered round is treated as seated for every entered round. An omitted name forfeits their ante when at least one score opens. Leave a whole round blank to skip it.</p></div><section class="rounds" id="rounds" aria-label="Nominee scores"></section><div class="row"><button type="button" id="grade">Grade entered rounds</button><button type="button" class="ghost" id="add">Add a nominee</button></div><p id="feedback" class="banner bad" role="alert" hidden></p><section id="results" class="results" aria-live="polite"></section><section id="standings" class="card standings" hidden></section><footer class="page-footer"><p id="self-check" class="fine" role="status"></p><p class="fine" data-session="attribution"></p></footer></main><script type="module">
+import "/core.js";
+import { DEFAULT_DOCKET_KEYS, NOMINEES } from "/domain.js";
+import { SESSION } from "/session.js";
+import { GAME_PHASE, MAX_NOMINEES, SCORE_MAX, SCORE_MIN } from "/protocol.js";
+
+const C = globalThis.JuryCore;
+const DISPLAY_DECIMALS = 2;
+const SELF_CHECK_TOLERANCE = 1e-6;
+const PERCENT = SCORE_MAX;
+const MAX_CUSTOM_NAME = 80;
+const rounds = [];
+const number = new Intl.NumberFormat("en-GB", { maximumFractionDigits: DISPLAY_DECIMALS });
+const feedback = document.getElementById("feedback");
+for (const element of document.querySelectorAll("[data-session]")) element.textContent = SESSION[element.dataset.session];
+
+function addRound(nominee) {
+  const index = rounds.length;
+  const card = document.createElement("article");
+  card.className = "card round";
+  const heading = document.createElement("h2");
+  heading.textContent = nominee?.name || `Additional nominee ${index - DEFAULT_DOCKET_KEYS.length + 1}`;
+  card.append(heading);
+  const name = document.createElement("input");
+  if (!nominee) {
+    name.type = "text";
+    name.maxLength = MAX_CUSTOM_NAME;
+    name.value = heading.textContent;
+    name.setAttribute("aria-label", "Nominee name");
+    card.append(name);
+  }
+  const blurb = document.createElement("p");
+  blurb.className = "fine";
+  blurb.textContent = nominee?.blurb || "Use the same policy as the room.";
+  card.append(blurb);
+  const label = document.createElement("label");
+  label.htmlFor = `scores-${index}`;
+  label.textContent = "Revealed scores or recusals";
+  const input = document.createElement("textarea");
+  input.id = label.htmlFor;
+  input.spellcheck = false;
+  input.placeholder = "Ada 0.62\nBen 58\nCem recuse";
+  label.append(input);
+  card.append(label);
+  document.getElementById("rounds").append(card);
+  rounds.push({ input, name, title: nominee?.name });
+  document.getElementById("add").disabled = rounds.length >= MAX_NOMINEES;
+}
+for (const key of DEFAULT_DOCKET_KEYS) addRound(NOMINEES.find((nominee) => nominee.key === key));
+document.getElementById("add").addEventListener("click", () => {
+  if (rounds.length >= MAX_NOMINEES) return;
+  addRound();
+  rounds.at(-1).name.focus();
+});
+
+function readRound(round, index) {
+  const title = round.title || round.name.value.trim();
+  const text = round.input.value.trim();
+  if (!text) return null;
+  if (!title) throw new Error(`Nominee ${index + 1}: enter a name.`);
+  const seen = new Set();
+  const plays = text.split(/\r?\n/).filter((line) => line.trim()).map((line, lineIndex) => {
+    const match = line.trim().match(/^(.+?)\s+(recuse|(?:\d+(?:\.\d*)?|\.\d+))$/i);
+    if (!match) throw new Error(`${title}, line ${lineIndex + 1}: enter a name followed by a score from 0 to 1 or 0 to 100, or recuse.`);
+    const pid = match[1].trim();
+    if (seen.has(pid)) throw new Error(`${title}, line ${lineIndex + 1}: ${pid} appears twice.`);
+    seen.add(pid);
+    if (match[2].toLowerCase() === "recuse") return { pid, recused: true };
+    const value = Number(match[2]);
+    if (!Number.isFinite(value) || value < SCORE_MIN || value > SCORE_MAX) throw new Error(`${title}, line ${lineIndex + 1}: use a score from 0 to 1 or 0 to 100.`);
+    const score = Math.round(value <= 1 ? value * PERCENT : value);
+    return { pid, score, revealed: true };
+  });
+  return { title, plays, leaks: [] };
+}
+function cell(row, value, className = "") {
+  const element = document.createElement("td");
+  element.textContent = value;
+  element.className = className;
+  row.append(element);
+}
+function table(headers) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "table-scroll";
+  const element = document.createElement("table");
+  const head = element.createTHead().insertRow();
+  for (const label of headers) {
+    const th = document.createElement("th");
+    th.scope = "col";
+    th.textContent = label;
+    head.append(th);
+  }
+  wrapper.append(element);
+  return { wrapper, body: element.createTBody() };
+}
+function signed(value) { return number.format(value); }
+document.getElementById("grade").addEventListener("click", () => {
+  feedback.hidden = true;
+  try {
+    const entered = rounds.map(readRound).filter(Boolean);
+    if (!entered.length) throw new Error("Enter at least one score or recusal before grading.");
+    const names = Array.from(new Set(entered.flatMap((round) => round.plays.map((play) => play.pid))));
+    const seatIds = new Map(names.map((name, index) => [name, `paper-juror-${index}`]));
+    const roster = names.map((name) => ({ pid: seatIds.get(name), joinedAt: 0 }));
+    const source = Object.fromEntries(entered.map((round, index) => [index, {
+      ...round,
+      plays: round.plays.map((play) => ({ ...play, pid: seatIds.get(play.pid) })),
+      seated: roster.map(({ pid }) => pid),
+    }]));
+    const ledger = C.ledger(entered, source, roster, { phase: GAME_PHASE.ENDED, gradedThrough: entered.length });
+    const results = document.getElementById("results");
+    results.replaceChildren();
+    ledger.results.forEach((result, index) => {
+      const article = document.createElement("article");
+      article.className = "card result";
+      const heading = document.createElement("h2");
+      heading.textContent = entered[index].title;
+      article.append(heading);
+      const summary = document.createElement("p");
+      summary.className = "fine";
+      const grading = result.grading;
+      summary.textContent = grading ? `Centre ${grading.centre.toFixed(DISPLAY_DECIMALS)} · band ±${grading.half.toFixed(3)} · ${grading.coherentCount} inside · ${grading.outlierCount} forfeiting` : "No opened scores: no grading and no absence forfeits.";
+      article.append(summary);
+      const output = table(["Juror", "Score", "Distance", "Grade", "Net points"]);
+      for (const name of names) {
+        const pid = seatIds.get(name);
+        const row = output.body.insertRow();
+        const grade = grading?.graded.find((juror) => juror.pid === pid);
+        const recused = result.recused.includes(pid);
+        cell(row, name);
+        cell(row, grade ? grade.score.toFixed(DISPLAY_DECIMALS) : "", "num");
+        cell(row, grade ? grade.distance.toFixed(3) : "", "num");
+        cell(row, grade ? grade.within ? "Inside" : "Forfeiting" : recused ? "Recused" : result.absent.includes(pid) ? "Absent" : "No score");
+        const net = result.delta[pid] || 0;
+        cell(row, signed(net), `num ${net < 0 ? "down" : "up"}`);
+      }
+      article.append(output.wrapper);
+      results.append(article);
+    });
+    const standings = document.getElementById("standings");
+    standings.hidden = false;
+    standings.replaceChildren();
+    const heading = document.createElement("h2");
+    heading.textContent = "Standings";
+    standings.append(heading);
+    const output = table(["Juror", "Net points"]);
+    names.sort((left, right) => ledger.balance[seatIds.get(right)] - ledger.balance[seatIds.get(left)] || left.localeCompare(right)).forEach((name) => {
+      const pid = seatIds.get(name);
+      const row = output.body.insertRow();
+      row.dataset.name = name;
+      cell(row, name);
+      cell(row, signed(ledger.balance[pid]), "num net");
+    });
+    standings.append(output.wrapper);
+  } catch (error) {
+    feedback.textContent = error.message;
+    feedback.hidden = false;
+  }
+});
+function finiteValues(value) {
+  if (typeof value === "number") return Number.isFinite(value);
+  if (!value || typeof value !== "object") return true;
+  return Object.values(value).every(finiteValues);
+}
+const cases = [[0.62], [0.5, 0.5, 0.5, 0.5, 0.5], [0, 1]];
+const passed = cases.every((scores) => {
+  const roster = scores.map((_, index) => ({ pid: `juror-${index}`, joinedAt: 0 }));
+  const plays = roster.map(({ pid }, index) => ({ pid, score: Math.round(scores[index] * PERCENT), revealed: true }));
+  const result = C.nomineeDeltas(plays, [], roster, { seated: roster.map(({ pid }) => pid) });
+  const reward = Object.values(result.delta).reduce((total, value) => total + value, 0);
+  return finiteValues(result) && Math.abs(reward - C.ROUND_REWARD) < SELF_CHECK_TOLERANCE;
+});
+const selfCheck = document.getElementById("self-check");
+selfCheck.textContent = passed ? "Self-check passed." : "Self-check failed. Do not use this calculator.";
+if (!passed) { document.getElementById("grade").disabled = true; selfCheck.className = "banner bad"; }
+document.title = `${SESSION.project}: paper jury calculator`;
+</script></body></html>

@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Coherence game</title><link rel="icon" href="data:,"><link rel="stylesheet" href="/paper.css"><style>.home{max-width:1050px;gap:2rem}.hero{padding-block:1.5rem;display:grid;gap:1.2rem}.hero h1{font-size:clamp(2.5rem,6vw,4.6rem);letter-spacing:-.025em;max-width:18ch}.hero .subtitle{font-size:1.5rem;color:var(--upheld)}.home-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:1.2rem}.room-entry{display:grid;gap:1rem}.room-entry form{display:grid;gap:.8rem}.resources{display:grid;gap:.5rem}.resource{display:block;padding:.8rem;border-bottom:1px solid var(--hair);text-decoration:none}.resource strong{display:block;font-size:1.1rem}.resource span{font:.75rem/1.5 var(--mono);color:var(--muted)}@media(max-width:650px){.home-grid{grid-template-columns:1fr}}</style></head><body><main class="page home"><header class="page-header"><span class="dc-brand" data-session="project"></span><a class="fine" href="/join/">Follow the project</a></header><section class="hero"><p class="eyebrow">Coherence game</p><h1 data-session="title"></h1><p class="subtitle" data-session="subtitle"></p><p class="lede">Strangers score the infrastructure research depends on, against one public policy. Scores open together. The room’s centre and spread determine who shares the reward and who forfeits.</p><p class="fine"><span data-session="event"></span><br><span data-session="day"></span> · <span data-session="venue"></span></p></section><div class="home-grid"><section class="card room-entry"><h2>Enter your room code</h2><p>No account or wallet. A phone will do.</p><form id="room-form" novalidate><label for="room-code">Room code<input type="text" id="room-code" name="room" autocomplete="off" autocapitalize="none" required></label><p id="feedback" class="banner bad" role="alert" hidden></p><button type="submit">Enter the room</button></form><p class="fine">Workshop points illustrate the incentives. They are not money.</p></section><nav class="card resources" aria-label="Session kit"><a class="resource" href="/deck/"><strong>The session deck</strong><span>Read the policy, play the game, examine the objections.</span></a><a class="resource" href="/handout/"><strong>The one-page handout</strong><span>Read online or <span id="pdf-status">download the printable PDF</span>.</span></a><a class="fine" href="/handout/handout.pdf" id="pdf-link">Download printable handout</a><a class="resource" href="/paper/"><strong>Paper fallback</strong><span>Grade revealed scores with the same ledger.</span></a><a class="resource" href="/paper/sheets.html"><strong>Print score sheets</strong><span>Two score sheets per A4 page.</span></a><a class="resource" href="/join/"><strong>Stay in touch</strong><span>Follow the project or run a jury in your community.</span></a></nav></div><footer class="page-footer"><p class="fine" data-session="attribution"></p><p class="fine">Read the <a id="paper-link">working paper</a>. Licence: <span data-session="licence"></span>.</p></footer></main><script type="module">
+import { SESSION } from "/session.js";
+import { ROOM_CODE, roomPath } from "/protocol.js";
+for (const element of document.querySelectorAll("[data-session]")) element.textContent = SESSION[element.dataset.session];
+document.getElementById("paper-link").href = SESSION.paperUrl;
+const roomInput = document.getElementById("room-code");
+roomInput.minLength = ROOM_CODE.minLength;
+roomInput.maxLength = ROOM_CODE.maxLength;
+roomInput.pattern = ROOM_CODE.pattern;
+roomInput.value = SESSION.roomCode;
+document.getElementById("room-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const input = document.getElementById("room-code");
+  const code = input.value.trim();
+  const feedback = document.getElementById("feedback");
+  if (!code || !input.validity.valid) { feedback.textContent = `Use a room code of ${ROOM_CODE.minLength} to ${ROOM_CODE.maxLength} letters, numbers or hyphens.`; feedback.hidden = false; input.setAttribute("aria-invalid", "true"); input.focus(); return; }
+  location.assign(roomPath(code));
+});
+document.title = `${SESSION.title}: Coherence game`;
+</script></body></html>

@@ -1,0 +1,44 @@
+{
+  "name": "coherence-game",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "GPL-3.0-only",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "types": "wrangler types",
+    "typecheck": "npm run types && tsc --noEmit && tsc --project tsconfig.browser.json --noEmit",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "check:dependencies": "node scripts/check-dependencies.mjs",
+    "scan": "npm run check:dependencies && npm audit --audit-level=low",
+    "test": "vitest run --config vitest.config.ts",
+    "test:worker": "npm run types && vitest run --config vitest.config.worker.ts",
+    "test:e2e": "playwright test",
+    "dev": "wrangler dev --port 8787",
+    "deploy": "wrangler deploy",
+    "qr": "node scripts/qr.mjs",
+    "print": "node scripts/print-handout.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.6",
+    "@biomejs/biome": "2.5.14",
+    "@cloudflare/vitest-pool-workers": "0.19.1",
+    "@playwright/test": "1.63.0",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11",
+    "wrangler": "4.116.0",
+    "qrcode": "1.5.4",
+    "pdf-lib": "1.17.1"
+  },
+  "overrides": {
+    "undici": "7.29.1",
+    "youch": "4.1.1",
+    "sharp": "0.35.5",
+    "source-map-js": "1.2.2",
+    "semver": "7.8.5",
+    "@img/colour": "1.1.0"
+  }
+}
