@@ -3,7 +3,7 @@ import { roomPath } from "./protocol.js";
 const PROJECT = "Decentralized Curation";
 const PAPER_DOI = "10.5281/zenodo.20543760";
 const PUBLIC_ADDRESS_PLACEHOLDER = "CHANGE-ME";
-const SITE = `https://coherence-game.${PUBLIC_ADDRESS_PLACEHOLDER}.workers.dev`;
+const SITE = "https://coherence-game.0xferit.workers.dev";
 
 export const SESSION = Object.freeze({
   title: "Credible consensus among strangers",
