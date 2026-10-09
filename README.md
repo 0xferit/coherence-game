@@ -58,12 +58,13 @@ The print script checks the resulting document's page count and A4 dimensions. T
 ## Deploy
 
 ```sh
-npx wrangler login
-npx wrangler secret put ADMIN_TOKEN
-npm run deploy
+npx --no-install wrangler login --scopes account:read user:read workers_scripts:write
+npx --no-install wrangler deploy --secrets-file "$DEPLOY_SECRETS_FILE"
 ```
 
-Keep the admin token in your password manager. Only the bearer of that token can export the mailing-list records from `/api/signups.csv`. The public sign-up form cannot read them.
+Create a random export token in your password manager. Set `DEPLOY_SECRETS_FILE` to a private JSON file outside the repository containing `{"ADMIN_TOKEN":"your export token"}`. Deployment uploads it as a Worker secret; remove the temporary file afterwards. On macOS, add `--use-keyring` to login to keep credentials encrypted with a key in the system keychain. Cloudflare documents [uploading secrets with code](https://developers.cloudflare.com/workers/configuration/secrets/#upload-secrets-alongside-code).
+
+Only the bearer of the export token can read mailing-list records from `/api/signups.csv`. The public sign-up form cannot read them. Subsequent deployments preserve the secret and can use `npm run deploy`.
 
 After the first deployment, update the shared session address, regenerate and inspect the printable materials, and deploy again. Check the final site from a phone and laptop before the session.
 
