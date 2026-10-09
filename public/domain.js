@@ -8,7 +8,7 @@ function frozen(value) {
 
 export const POLICY = frozen({
   scope: "open infrastructure that research depends on",
-  question:
+  prompt:
     "How much does this nominee’s completed and maintained work underpin how research is done, shared and kept, now?",
   anchors: [
     ["0.00", "not infrastructure"],
@@ -49,7 +49,7 @@ const DEFAULT_NOMINEES = [
     name: "Inkscape",
     blurb:
       "The free vector drawing program, built largely by volunteers since 2003, behind a great many conference posters, journal figures and lab logos.",
-    note: "The bottom of the scale, the same shape as the worked colour map. You may have made your last poster in it; that is how much you use it, and it is excluded. Little in research breaks without it: the few pipelines that call it to convert SVG have other converters, and substitutes are plentiful. Scoring it high scores good software; the question asks a narrower thing.",
+    note: "The bottom of the scale, the same shape as the worked colour map. You may have made your last poster in it; that is how much you use it, and it is excluded. Little in research breaks without it: the few pipelines that call it to convert SVG have other converters, and substitutes are plentiful. Scoring it high scores good software; the prompt asks a narrower thing.",
   },
   {
     key: "linux",
@@ -70,7 +70,7 @@ const DEFAULT_NOMINEES = [
     name: "LaTeX",
     blurb:
       "The typesetting system much of mathematics, physics and computer science is written in. Knuth froze his TeX engine in 1990, bar bug fixes; LaTeX runs on successors such as pdfTeX and LuaTeX, kept up by a small volunteer team.",
-    note: "Your field is not the field. A mathematician cannot picture research without it; a clinician may never have opened it, because Word does the job there. The question asks about research as a whole, so your own field gets no extra weight. Jurors who score their own desk scatter, and the band is as wide as the larger group's agreement, so the scattered ones pay.",
+    note: "Your field is not the field. A mathematician cannot picture research without it; a clinician may never have opened it, because Word does the job there. The prompt asks about research as a whole, so your own field gets no extra weight. Jurors who score their own desk scatter, and the band is as wide as the larger group's agreement, so the scattered ones pay.",
   },
   {
     key: "arxiv",
@@ -97,7 +97,7 @@ const SPARE_NOMINEES = [
     name: "Software Heritage",
     blurb:
       "The archive of publicly available source code, started at Inria in 2016 and backed by UNESCO since 2017. It keeps copies of code from hosts that have since shut down, such as Google Code and Gitorious.",
-    note: "The three tests disagree. Most researchers never open it directly, and if it stopped today little would break this week beyond Guix source fallbacks and SWHID links. But for code gone from its original host it can be the only copy left, and ‘kept’ is in the question. Weigh this week and you land low; weigh the record and you land high. The band follows whichever reading more of the jury takes.",
+    note: "The three tests disagree. Most researchers never open it directly, and if it stopped today little would break this week beyond Guix source fallbacks and SWHID links. But for code gone from its original host it can be the only copy left, and ‘kept’ is in the prompt. Weigh this week and you land low; weigh the record and you land high. The band follows whichever reading more of the jury takes.",
   },
   {
     key: "git",
@@ -118,7 +118,7 @@ const SPARE_NOMINEES = [
     name: "OpenAlex",
     blurb:
       "The open, CC0 index of scholarly works, authors and institutions, launched by a non-profit in 2022 as Microsoft retired its academic graph. Sorbonne University dropped Web of Science for it in 2024.",
-    note: "The substitute question with a price on it. Web of Science and Scopus do much of the same job, for a subscription many institutions cannot pay. The policy asks ‘any substitute’, not ‘any free one’: a paid substitute is weaker, not none. Its own heavy application programming interface use is now metered; the data stays free. Gaps in its metadata are a quality complaint: excluded.",
+    note: "The substitute test with a price on it. Web of Science and Scopus do much of the same job, for a subscription many institutions cannot pay. The policy asks ‘any substitute’, not ‘any free one’: a paid substitute is weaker, not none. Its own heavy application programming interface use is now metered; the data stays free. Gaps in its metadata are a quality complaint: excluded.",
   },
   {
     key: "ojs",
@@ -139,7 +139,7 @@ const SPARE_NOMINEES = [
     name: "OpenStreetMap",
     blurb:
       "The open map of the world, built mostly by volunteers alongside paid corporate teams, under the Open Database License. Navigation apps, humanitarian responders and many research projects use it.",
-    note: "Score the research slice. Its general reach is enormous, but the question asks how much research stands on it: geography, urban and transport studies, and disaster and health mapping use it heavily; most of research never touches it. Score the map’s fame and you land high; score the question and you land in the lower middle.",
+    note: "Score the research slice. Its general reach is enormous, but the prompt asks how much research stands on it: geography, urban and transport studies, and disaster and health mapping use it heavily; most of research never touches it. Score the map’s fame and you land high; score the prompt and you land in the lower middle.",
   },
 ];
 

@@ -14,7 +14,7 @@
   @media (max-width:900px){ .split{grid-template-columns:1fr} }
   @media (min-width:1200px){
     body{font-size:1.06rem}
-    .law-q{font-size:1.5rem}
+    .law-prompt{font-size:1.5rem}
     .rubric table{font-size:.8rem}
   }
 
@@ -37,7 +37,7 @@
 
   .law{background:var(--sunk);border-left:3px solid var(--upheld);padding:.8rem .95rem;
        display:flex;flex-direction:column;gap:.6rem}
-  .law-q{font-family:var(--serif);font-size:clamp(1rem,2.2vw,1.25rem);line-height:1.3}
+  .law-prompt{font-family:var(--serif);font-size:clamp(1rem,2.2vw,1.25rem);line-height:1.3}
   .scaleviz{display:flex;flex-direction:column;gap:.25rem}
   .scaleviz .bar{height:8px;border-radius:4px;
     background:linear-gradient(90deg,var(--hair),var(--upheld-soft),var(--upheld))}
@@ -876,7 +876,7 @@ function netBanner() {
 }
 
 function lawBlock() {
-  return `<div class="law"><h3>Our curation policy for ${esc(POLICY.scope)}</h3><p class="law-q">${esc(POLICY.question)}</p>` +
+  return `<div class="law"><h3>Our curation policy for ${esc(POLICY.scope)}</h3><p class="law-prompt">${esc(POLICY.prompt)}</p>` +
     `<div class="scaleviz"><div class="bar"></div><div class="ticks">${POLICY.anchors.map((a) => `<span><b>${a[0]}</b>${esc(a[1])}</span>`).join("")}</div></div>` +
     '<div class="lawkey">Consider, in this order</div>' +
     `<div class="rubric"><table><thead><tr><th>worked example</th>${POLICY.tests.map((t) => `<th>${esc(t)}</th>`).join("")}</tr></thead><tbody>` +
