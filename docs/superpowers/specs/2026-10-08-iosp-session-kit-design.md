@@ -37,7 +37,7 @@ The approved public repository is `0xferit/coherence-game`. The public host is a
 
 The Worker serves static assets, routes room WebSockets and accepts mailing-list submissions. Each room has its own SQLite-backed Room Durable Object. A separate Signups Durable Object stores mailing-list records. The browser pages use JavaScript modules without a site build step; the Worker uses TypeScript.
 
-Dependency integrity rules and explicitly approved exceptions are recorded in `docs/dependency-policy.md`, `dependency-policy.json`, `.npmrc` and the committed lockfile. Exact direct dependency versions remain in `package.json`. The licence is GPL-3.0-only. The session module supplies the approved attribution placeholder until final wording is confirmed.
+Dependency integrity rules and explicitly approved exceptions are recorded in `docs/dependency-policy.md`, `dependency-policy.json`, `.npmrc` and the committed lockfile. Exact direct dependency versions remain in `package.json`. The licence is GPL-3.0-only. The session module supplies the researcher's attribution.
 
 ## Live game contract
 
@@ -110,7 +110,7 @@ Release requires the declared dependency checks, type checking, lint, unit tests
 
 A full browser run uses thirty independent contexts against the local Worker and plays the default docket. It includes recusal, a changed seal, a proof report, two tabs sharing a seat, a participant sleeping through reveal, a host takeover during reveal and agreement of all final standings. Browser cleanup must run on success and failure.
 
-The final print outputs are checked for page count, dimensions, clipping and readable codes. After deployment, the host tests the final site from a phone and laptop and conducts a dry run. Venue confirmation, final attribution wording, printing and any external event registration remain release logistics rather than automated game behaviour.
+The final print outputs are checked for page count, dimensions, clipping and readable codes. After deployment, the host tests the final site from a phone and laptop and conducts a dry run. Venue confirmation, printing and any external event registration remain release logistics rather than automated game behaviour.
 
 ## Outside scope
 

@@ -17,7 +17,7 @@ export const SESSION = Object.freeze({
   roomCode: "leiden",
   paperDoi: PAPER_DOI,
   paperUrl: `https://doi.org/${PAPER_DOI}`,
-  attribution: `A ${PROJECT} research project, developed at Golem Foundation.`,
+  attribution: `${PROJECT} research by Ferit Tunçer.`,
   licence: "GPL-3.0-only",
 });
 
