@@ -1,6 +1,6 @@
 # Likely questions, and the answers to give
 
-The objections a sceptical room raises beyond the five on the deck, in the order they are likely to land hard. Each entry gives the question as it is asked from the floor, the answer, what to concede, and the answer to avoid. Every number comes from running the site's own ledger (`public/core.js`) on rooms of thirty with equal seats.
+The objections a sceptical room raises beyond the five on the deck, in the order they are likely to land hard. Each entry gives the question as it is asked from the floor, the answer, what to concede, and the answer to avoid. Every number comes from running the site's own ledger (`public/core.js`) on rooms of thirty with equal seats. The runs are in `scripts/red-team/`, and the full red-team report is [red-team-2026-10-09.md](red-team-2026-10-09.md).
 
 ## 1. "You pay me to forecast the room, not to read the evidence."
 
