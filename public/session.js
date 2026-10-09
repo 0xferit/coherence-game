@@ -4,6 +4,10 @@ const PROJECT = "Decentralized Curation";
 const PAPER_DOI = "10.5281/zenodo.20543760";
 const PUBLIC_ADDRESS_PLACEHOLDER = "CHANGE-ME";
 const SITE = "https://coherence-game.0xferit.workers.dev";
+const COPYRIGHT = "Copyright (C) 2026 Ferit Tunçer";
+const CODE_LICENCE = "GPL-3.0-or-later";
+const CONTENT_LICENCE = "CC BY 4.0";
+const LICENCE = `code ${CODE_LICENCE}, text and figures ${CONTENT_LICENCE}`;
 
 export const SESSION = Object.freeze({
   title: "Credible consensus among strangers",
@@ -18,7 +22,11 @@ export const SESSION = Object.freeze({
   paperDoi: PAPER_DOI,
   paperUrl: `https://doi.org/${PAPER_DOI}`,
   attribution: `${PROJECT} research by Ferit Tunçer.`,
-  licence: "GPL-3.0-only",
+  copyright: COPYRIGHT,
+  codeLicence: CODE_LICENCE,
+  contentLicence: CONTENT_LICENCE,
+  licence: LICENCE,
+  legal: `${COPYRIGHT}. Licence: ${LICENCE}.`,
 });
 
 export function roomUrl() {

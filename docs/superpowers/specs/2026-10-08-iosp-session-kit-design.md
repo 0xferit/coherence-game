@@ -37,7 +37,7 @@ The approved public repository is `0xferit/coherence-game`. The public host is a
 
 The Worker serves static assets, routes room WebSockets and accepts mailing-list submissions. Each room has its own SQLite-backed Room Durable Object. A separate Signups Durable Object stores mailing-list records. The browser pages use JavaScript modules without a site build step; the Worker uses TypeScript.
 
-Dependency integrity rules and explicitly approved exceptions are recorded in `docs/dependency-policy.md`, `dependency-policy.json`, `.npmrc` and the committed lockfile. Exact direct dependency versions remain in `package.json`. The licence is GPL-3.0-only. The session module supplies the researcher's attribution.
+Dependency integrity rules and explicitly approved exceptions are recorded in `docs/dependency-policy.md`, `dependency-policy.json`, `.npmrc` and the committed lockfile. Exact direct dependency versions remain in `package.json`. The code is licensed GPL-3.0-or-later and the deck and handout text and figures CC BY 4.0, both under Ferit Tunçer's copyright; the session module supplies the attribution line and the licence line.
 
 ## Live game contract
 

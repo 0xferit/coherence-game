@@ -70,4 +70,10 @@ After the first deployment, update the shared session address, regenerate and in
 
 ## Licence
 
-GPL-3.0-only. See `LICENSE`. Attribution is defined in the session module.
+Copyright (C) 2026 Ferit Tunçer.
+
+The code is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. The licence text is in `LICENSE`.
+
+The text and figures of the deck (`public/deck/`) and the handout (`public/handout/`) are licensed under the Creative Commons Attribution 4.0 International licence (CC BY 4.0), whose text is in `LICENSE-CC-BY-4.0`.
+
+The attribution line and the licence line shown on the pages are defined in the session module.
