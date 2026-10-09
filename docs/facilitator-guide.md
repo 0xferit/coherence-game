@@ -11,6 +11,8 @@ How to run the ninety-minute session with the kit on this site. Times are from t
 
 ## At the venue, before people arrive
 
+The room is the workshop room at the Poortgebouw. The slot on the community map is 14:00 to 15:20, eighty minutes rather than ninety, so plan five nominees (open NumPy only if the room is quick) and keep the objections to twenty-five minutes; the table below is the ninety-minute shape.
+
 - Check the Wi-Fi or mobile signal from both devices. Load `/r/leiden` on the phone over mobile data as well, so you know which network works.
 - Summon the jury from the laptop: enter your name, leave the six nominees of the docket ticked (Inkscape, Linux, PDF, LaTeX, arXiv, NumPy), press "Summon a jury and host it". The seven spares stay unticked unless the room is fast; the docket cannot change once summoned.
 - Leave the laptop on the lobby screen. Keep the handouts and a few score sheets at hand.
