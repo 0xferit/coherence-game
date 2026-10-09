@@ -24,7 +24,7 @@ if (!Number.isInteger(count) || count < 1 || count > MAX_JURORS) {
     const project = document.createElement("span"); project.textContent = SESSION.project;
     const seat = document.createElement("span"); seat.textContent = `Juror ${index + 1} / ${count}`;
     header.append(project, seat); sheet.append(header);
-    const title = document.createElement("h1"); title.textContent = "Coherence game: score sheet"; sheet.append(title);
+    const title = document.createElement("h1"); title.textContent = `${SESSION.project}: score sheet`; sheet.append(title);
     const prompt = document.createElement("p"); prompt.className = "sheet-rule"; prompt.textContent = POLICY.prompt; sheet.append(prompt);
     const name = document.createElement("div"); name.className = "name-line"; name.append("Your name:", document.createElement("span")); sheet.append(name);
     const table = document.createElement("table");

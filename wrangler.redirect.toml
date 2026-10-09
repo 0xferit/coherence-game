@@ -1,11 +1,14 @@
-name = "decentralized-curation"
+name = "coherence-game"
 main = "src/worker.ts"
 compatibility_date = "2026-07-30"
+
+[vars]
+REDIRECT_TO = "https://decentralized-curation.0xferit.workers.dev"
 
 [assets]
 directory = "./public"
 binding = "ASSETS"
-run_worker_first = ["/r/*", "/api/*"]
+run_worker_first = true
 
 [[durable_objects.bindings]]
 name = "ROOM"

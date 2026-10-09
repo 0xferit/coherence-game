@@ -14,7 +14,7 @@ The kit supports a ninety-minute public workshop for about thirty participants u
 | Objections and defences | 30 | Examine herding, vote buying, collusion and policy quality |
 | Where it fits and close | 15 | Discuss uses, the working paper and follow-up |
 
-The public material leads with Decentralized Curation and calls the game “Coherence game”. It uses British spelling, defines abbreviations at first use and avoids em dashes. It contains no project-internal issue references, budgets or organisational decisions.
+The public material leads with Decentralized Curation and calls the game by the project name, Decentralized Curation. It uses British spelling, defines abbreviations at first use and avoids em dashes. It contains no project-internal issue references, budgets or organisational decisions.
 
 The workshop stays on one judgment: how much completed work matters under a published funding policy. Bonded claims, challenges, an accuracy layer and governance are outside its scope. Claims remain cautious: the working paper does not establish that honest scoring is a best response and supplies no safe collusion threshold. Random draws weighted by stake and appeals may be discussed as proposed defences; the workshop does not perform a live draw.
 
@@ -33,7 +33,7 @@ The kit is one public website plus printable materials. Participants need no acc
 
 ## Hosting and repository
 
-The approved public repository is `0xferit/coherence-game`. The public host is a Cloudflare Worker at `coherence-game.<account>.workers.dev`; its confirmed address is set in the session module after deployment. Deck review takes place on a preview deployment of that website.
+The approved public repository is `0xferit/decentralized-curation`. The public host is a Cloudflare Worker at `decentralized-curation.<account>.workers.dev`; its confirmed address is set in the session module after deployment. Deck review takes place on a preview deployment of that website.
 
 The Worker serves static assets, routes room WebSockets and accepts mailing-list submissions. Each room has its own SQLite-backed Room Durable Object. A separate Signups Durable Object stores mailing-list records. The browser pages use JavaScript modules without a site build step; the Worker uses TypeScript.
 

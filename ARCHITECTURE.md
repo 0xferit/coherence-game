@@ -2,7 +2,7 @@
 
 ## Scope
 
-A public, multiplayer version of the Coherence game: a room of jurors scores nominees against a published policy with sealed scores, the scores are opened together, and every client derives the same ledger. One Cloudflare Worker serves the static site and the live store. The ledger arithmetic is a browser module shared by the game and the host's paper tool.
+The public, multiplayer jury game of Decentralized Curation: a room of jurors scores nominees against a published policy with sealed scores, the scores are opened together, and every client derives the same ledger. One Cloudflare Worker serves the static site and the live store. The ledger arithmetic is a browser module shared by the game and the host's paper tool.
 
 ## Components and what talks to what
 
@@ -17,11 +17,13 @@ A public, multiplayer version of the Coherence game: a room of jurors scores nom
 | Game page (`public/r/index.html`) | Renders the screens and writes through the store client. It never computes a band, a forfeit or a share itself. |
 | Pages: deck, handout, sign-up, paper tool | Static. The paper tool imports the ledger. |
 
+The former address, `coherence-game.0xferit.workers.dev`, is a second deployment of the same code from `wrangler.redirect.toml`. There every path runs through the Worker, and `REDIRECT_TO` answers each request except `GET /api/signups.csv` with a 301 to the same path and query on the current address. That deployment keeps its own Durable Objects, which hold the mailing-list rows collected before the move; they are read with that deployment's token, so the list is the union of two exports until the old deployment is retired.
+
 ## Where state lives
 
 - In the Room, under SQLite tables `docs`, `leases` and `seats`: the game state document `game/state` (phase, nominee index, host, epoch, bloc seed, the docket), and under `games/<epoch>/`: the roster (`players/<pid>`), per nominee (`nominees/n<i>`) its `openedAt`, `closedAt` and `seated` list, its plays (`plays/<pid>`) and its leak reports (`leaks/<leakerPid>`).
 - On each juror's device, in local storage only: the juror id and secret, the name, and the salt of each sealed score. Nobody else holds a salt.
-- In the Signups object: the mailing-list rows.
+- In the Signups object: the mailing-list rows. Rows collected before the move stay in the former deployment's own object.
 - Nowhere: balances. Every client derives them from the store with the ledger; there is no settlement write.
 
 ## Guarantees at the Room boundary

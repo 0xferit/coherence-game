@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Coherence game</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Decentralized Curation</title>
 <link rel="icon" href="data:,"><link rel="stylesheet" href="/paper.css">
 <style>
 
@@ -232,7 +232,7 @@
 <body>
 <div class="wrap">
   <header class="bar">
-    <div class="brand"><span class="dc-brand" id="session-project"></span><span>Coherence game</span></div>
+    <div class="brand"><span class="dc-brand" id="session-project"></span></div>
     <div class="status" id="status"></div>
   </header>
   <main id="app"><div class="card"><p class="fine">Connecting to the room…</p></div></main>
@@ -1175,7 +1175,7 @@ function renderSummon() {
 
 function renderJoin() {
   app.innerHTML = `${netBanner()}<div class="split"><div class="stack">${lawBlock()}</div><div class="stack">` +
-    `<div class="card"><h1>Coherence game</h1><p class="fine">${nominees.length} nominees from the infrastructure research runs on, scored under this policy. Sealed scores, opened together.</p>` +
+    `<div class="card"><h1>${SESSION.project}</h1><p class="fine">${nominees.length} nominees from the infrastructure research runs on, scored under this policy. Sealed scores, opened together.</p>` +
     '<div class="rule"><b>Graded against the jury, not against the truth</b>The nearer the jury’s centre you land, the larger your share of the round’s pot. The farther beyond the band, the more of your own stake you forfeit. The only thing all of you share is the policy.</div>' +
     `<div class="strip"><div><b>${n(GAME_ANTE)}</b><span>stake per nominee</span></div><div class="g"><b>+</b><span>near the jury</span></div><div class="r"><b>−</b><span>far from it</span></div></div>` +
     (myName ? '<p class="fine">A jury is summoned. Take your seat.</p>' : "") +

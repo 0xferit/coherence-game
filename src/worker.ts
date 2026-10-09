@@ -4,6 +4,16 @@ import { Signups } from "./signups";
 
 export { Room, Signups };
 
+const ADMIN_EXPORT_PATH = "/api/signups.csv";
+
+function movedTo(url: URL, env: Env): URL | null {
+  if (!env.REDIRECT_TO || url.pathname === ADMIN_EXPORT_PATH) return null;
+  const target = new URL(env.REDIRECT_TO);
+  target.pathname = url.pathname;
+  target.search = url.search;
+  return target;
+}
+
 function adminAllowed(request: Request, env: Env): boolean {
   return (
     Boolean(env.ADMIN_TOKEN) && request.headers.get("Authorization") === `Bearer ${env.ADMIN_TOKEN}`
@@ -13,6 +23,8 @@ function adminAllowed(request: Request, env: Env): boolean {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+    const moved = movedTo(url, env);
+    if (moved) return Response.redirect(moved.href, 301);
     const room = parseRoomRoute(url.pathname);
     if (room) {
       const code = room.code;
@@ -33,7 +45,7 @@ export default {
         new Request("https://signups/add", request),
       );
     }
-    if (url.pathname === "/api/signups.csv") {
+    if (url.pathname === ADMIN_EXPORT_PATH) {
       if (request.method !== "GET")
         return new Response("Method not allowed", { status: 405, headers: { Allow: "GET" } });
       if (!adminAllowed(request, env))

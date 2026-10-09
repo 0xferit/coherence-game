@@ -1,4 +1,4 @@
-# Coherence game
+# Decentralized Curation
 
 A jury of strangers scores projects against a published curation policy. Scores are sealed, opened together, and every participant derives the same ledger. The workshop uses points and equal seats. It demonstrates rewards for agreement under the policy; it does not establish that honest scoring wins or a safe threshold for collusion.
 
@@ -65,6 +65,8 @@ npx --no-install wrangler deploy --secrets-file "$DEPLOY_SECRETS_FILE"
 Create a random export token in your password manager. Set `DEPLOY_SECRETS_FILE` to a private JSON file outside the repository containing `{"ADMIN_TOKEN":"your export token"}`. Deployment uploads it as a Worker secret; remove the temporary file afterwards. On macOS, add `--use-keyring` to login to keep credentials encrypted with a key in the system keychain. Cloudflare documents [uploading secrets with code](https://developers.cloudflare.com/workers/configuration/secrets/#upload-secrets-alongside-code).
 
 Only the bearer of the export token can read mailing-list records from `/api/signups.csv`. The public sign-up form cannot read them. Subsequent deployments preserve the secret and can use `npm run deploy`.
+
+The former address redirects to the current one through a second deployment of the same code: `npx --no-install wrangler deploy --config wrangler.redirect.toml`. Run it after any change to the Worker so the two stay on one version. It needs no new secret; that deployment keeps its own.
 
 After the first deployment, update the shared session address, regenerate and inspect the printable materials, and deploy again. Check the final site from a phone and laptop before the session.
 

@@ -12,7 +12,7 @@ describe("Worker routes", () => {
       const response = await SELF.fetch(`${BASE}${path}`);
       expect(response.status).toBe(200);
       expect(response.headers.get("content-type")).toContain("text/html");
-      expect(await response.text()).toContain("Coherence game");
+      expect(await response.text()).toContain("Decentralized Curation");
     }
   });
 
@@ -46,6 +46,6 @@ describe("Worker routes", () => {
   it("serves the landing page at the root", async () => {
     const response = await SELF.fetch(`${BASE}/`);
     expect(response.status).toBe(200);
-    expect(await response.text()).toContain("Coherence game");
+    expect(await response.text()).toContain("Decentralized Curation");
   });
 });

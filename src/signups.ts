@@ -111,7 +111,7 @@ export class Signups extends DurableObject<Env> {
     return new Response(`${lines.join("\n")}\n`, {
       headers: {
         "content-type": "text/csv; charset=utf-8",
-        "content-disposition": 'attachment; filename="coherence-game-signups.csv"',
+        "content-disposition": 'attachment; filename="decentralized-curation-signups.csv"',
         "cache-control": "no-store",
       },
     });
