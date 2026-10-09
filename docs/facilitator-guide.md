@@ -1,6 +1,6 @@
 # Facilitator guide
 
-How to run the ninety-minute session with the kit on this site. Times are from the start of the session. Deck slides are numbered as on screen; the game's buttons are quoted as they appear.
+How to run the session with the kit on this site. Times are from the start of the session. Deck slides are numbered as on screen; the game's buttons are quoted as they appear.
 
 ## The day before
 
@@ -17,6 +17,8 @@ The room is the workshop room at the Poortgebouw. The slot on the community map 
 - Summon the jury from the laptop: enter your name, leave the six nominees of the docket ticked (Inkscape, Linux, PDF, LaTeX, arXiv, NumPy), press "Summon a jury and host it". The seven spares stay unticked unless the room is fast; the docket cannot change once summoned.
 - Leave the laptop on the lobby screen. Keep the handouts and a few score sheets at hand.
 
+The questions a sceptical room raises beyond the five objections on the deck, with the answer to give and the answer to avoid, are in [likely-questions.md](likely-questions.md).
+
 ## Run of show
 
 | Time | Deck | What you do |
@@ -24,8 +26,8 @@ The room is the workshop room at the Poortgebouw. The slot on the community map 
 | 0:00 | 1 to 3 | The claim: every funding round ends in a split that needs numbers nobody can verify; "what happened" and "how much does it matter" are two questions, and today is about the second. |
 | 0:10 | 4 | Everyone scans the room code on the handout, or types the address. Each person enters a name and presses "Take a seat". Watch the seated count in the status bar reach the room. Remove a duplicate or stray seat with the cross on its chip while still in the lobby. |
 | 0:13 | 5 and 6 | Read the policy together: the prompt, the five anchors, the three worked examples, the four things that are not the jury's job. Then how they are paid: nearer the centre, more of the pot; beyond the band, a forfeit that grows with distance. Then the bet on slide 6: sealed scores leave only the prompt and the evidence in common, so the best forecast of the hidden centre is an honest reading; name the three conditions, a concrete prompt, jurors who know the field or recuse, and no coordination outside the game, because the objections test them. |
-| 0:15 | 7 | Play. Press "Open Inkscape". Sixty seconds show in everyone's status bar. "Close and reveal" unlocks when everyone has sealed or recused, or when time is up. Press it, wait for "Everyone has revealed." (a sleeping phone shows under "Not yet revealed"), press "Grade". Walk the room through its own results: the mean, the band, who was paid, who forfeited, the note under the table. Press "Next nominee". Repeat for Linux, PDF, LaTeX, arXiv and NumPy. About five minutes per nominee. |
-| 0:45 | 8 to 12 | The objections, in the order the room raises them, using the room's own rounds: herding, vote buying, collusion (the arXiv round: about half the jurors had a private instruction to score 0.10; the banner on its results says what the bloc did), a vague policy, fake identities. |
+| 0:15 | 7 | Before the first round, say the prediction out loud so the demonstration can fail: Inkscape and Linux should give narrow bands with few forfeits, PDF a wide band; if the clear cases come out wide the prompt failed, and if the split case comes out narrow the room herded on something outside the prompt. Then play. Press "Open Inkscape". Sixty seconds show in everyone's status bar. "Close and reveal" unlocks when everyone has sealed or recused, or when time is up. Press it, wait for "Everyone has revealed." (a sleeping phone shows under "Not yet revealed"), press "Grade". Walk the room through its own results: the mean, the band, who was paid, who forfeited, the note under the table. Press "Next nominee". Repeat for Linux, PDF, LaTeX, arXiv and NumPy. About five minutes per nominee. |
+| 0:45 | 8 to 12 | The objections, in the order the room raises them, using the room's own rounds: herding, vote buying, collusion (the arXiv round: a majority of the jurors, 55 percent, had a private instruction to score 0.10; the banner on its results says what the bloc did), a vague policy, fake identities. |
 | 1:15 | 13 | Where it fits: review panels, grant programmes, community funds. What it costs: a public policy, a docket, a room and an hour. |
 | 1:20 | 14 | Close. Questions. The paper and the mailing-list codes are on the slide and on the handout. Press "Finish" after the last nominee if you have not already; the final standings stay on every phone. |
 
