@@ -4,6 +4,7 @@ import { ROOM_CODE, SIGNUP_LIMITS } from "../public/protocol.js";
 test.use({ reducedMotion: "reduce" });
 
 const PHONE = { width: 375, height: 740 };
+const SHORT_PHONE = { width: 390, height: 667 };
 const PAGES = ["/", "/deck/", "/handout/", "/join/", "/paper/", "/paper/sheets.html"];
 
 test("session pages fit a phone and execute without page errors", async ({ page }) => {
@@ -49,6 +50,34 @@ test("deck has fourteen slides and supports keyboard changes to a real jury", as
   await expect(page.locator("#w-bloc .v-bloc")).toHaveText("60%");
   await page.locator("#w-bloc .reset").click();
   await expect(page.locator("#w-bloc .v-bloc")).toHaveText("0%");
+});
+
+test("deck advances from the tall slide still being read on a phone", async ({ page }) => {
+  await page.setViewportSize(SHORT_PHONE);
+  await page.goto("/deck/#s10");
+  await expect(page.locator("#progress")).toHaveText("10 / 14");
+  const initialSlide = await page.locator("#s10").boundingBox();
+  const readingArea = await page.locator("main").boundingBox();
+  if (!initialSlide || !readingArea) throw new Error("the deck has no visible reading area");
+  const initialScroll = await page.locator("main").evaluate((element) => element.scrollTop);
+  const lowerReadingFraction = 0.75;
+  const minimumReadingFraction = 0.7;
+  await page.mouse.move(
+    readingArea.x + readingArea.width / 2,
+    readingArea.y + readingArea.height / 2,
+  );
+  await page.mouse.wheel(0, initialSlide.height * lowerReadingFraction);
+  await expect
+    .poll(() => page.locator("main").evaluate((element) => element.scrollTop))
+    .toBeGreaterThan(initialScroll + initialSlide.height * minimumReadingFraction);
+  await expect(page.locator("#s10 p").last()).toBeInViewport({ ratio: 1 });
+  const slide = await page.locator("#s10").boundingBox();
+  if (!slide) throw new Error("the collusion slide has no visible geometry");
+  expect(slide.y).toBeLessThanOrEqual(0);
+  expect(slide.y + slide.height).toBeGreaterThan(0);
+  await expect(page.locator("#progress")).toHaveText("10 / 14");
+  await page.getByRole("button", { name: "Next", exact: true }).click();
+  await expect(page.locator("#progress")).toHaveText("11 / 14");
 });
 
 test("signup validates and retains values after a network failure", async ({ page }) => {

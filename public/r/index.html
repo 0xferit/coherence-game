@@ -1199,7 +1199,7 @@ function blocInstruction() {
   const c = nomineeDef();
   if (!c.bloc || !state || !inBloc(myPid, state.seed, state.blocFraction)) return "";
   return `<div class="banner bad"><b>Private: only you see this</b>You are in the bloc. <strong>Score ${esc(c.blocScore)}.</strong> If challenged, say ${esc(c.blocCover)}. That reading is excluded by the policy, but nobody can see <em>why</em> you scored, only what you scored. If enough of you comply the centre moves toward the bloc and the honest jurors forfeit to you.</div>` +
-    `<div class="banner amber"><b>But you cannot verify each other</b>The only way to prove you complied is to hand someone your sealed score. Whoever holds it can report you and cost you ${n(LEAK_PENALTY)} of your stake, keeping ${n(LEAK_BOUNTY)}. And it proves nothing anyway: either of you can replace a seal until the scoring closes.</div>`;
+    `<div class="banner amber"><b>Proving a sealed score is risky</b>Showing your score and salt words proves your current seal. A seated juror who receives a valid proof can report it and cost you ${n(LEAK_PENALTY)} of your stake, keeping ${n(LEAK_BOUNTY)}. The proof establishes that seal, not your final score: you can replace it until scoring closes.</div>`;
 }
 
 function payoffShape() {
@@ -1320,9 +1320,9 @@ function trackHtml(g, valid) {
   const CAP = "color-mix(in srgb, var(--charge) 28%, transparent)";
   const at = (x) => pinLeft(C.clamp01(x)).toFixed(1);
   const grad = `linear-gradient(90deg,${CAP} ${at(g.lo - g.half)}%,transparent ${at(g.lo)}%,${PEAK} ${at(g.centre)}%,transparent ${at(g.hi)}%,${CAP} ${at(g.hi + g.half)}%)`;
-  const total = (x) => (x > 0 && x < 1 ? `<span class="track__total" style="left:${at(x)}%"></span>` : "");
+  const total = (x) => (g.forfeitsEnabled && x > 0 && x < 1 ? `<span class="track__total" style="left:${at(x)}%"></span>` : "");
   return `<div class="track" style="height:${height}px"><span class="track__penalty" style="background:${grad}"></span><span class="track__band" style="left:${at(g.lo)}%;width:${Math.max(0, pinLeft(C.clamp01(g.hi)) - pinLeft(C.clamp01(g.lo))).toFixed(1)}%"></span>${total(g.lo - g.half)}${total(g.hi + g.half)}<span class="track__centre" style="left:${at(g.centre)}%"></span>${pins}</div>` +
-    '<div class="axis"><span>0.00</span><span>dotted line: total forfeit from here</span><span>1.00</span></div>';
+    `<div class="axis"><span>0.00</span><span>${g.forfeitsEnabled ? "dotted line: total forfeit from here" : "distance forfeits off: spread is essentially zero"}</span><span>1.00</span></div>`;
 }
 
 function ranked() {
@@ -1344,16 +1344,16 @@ function standingsHtml() {
 function blocBanner(c, r, g) {
   const assigned = r.valid.map((v) => v.pid).filter((pid) => inBloc(pid, state.seed, state.blocFraction));
   const target = Number.parseFloat(c.blocScore);
-  const complied = r.valid.filter((p) => assigned.includes(p.pid) && Math.abs(p.score / SCORE_MAX - target) <= BLOC_TOLERANCE).map((p) => p.pid);
-  const otherOut = g.graded.filter((x) => !x.within && !complied.includes(x.pid)).length;
-  const blocOut = g.graded.filter((x) => !x.within && complied.includes(x.pid)).length;
-  const blocShare = g.graded.filter((x) => x.within && complied.includes(x.pid)).reduce((s, x) => s + x.share, 0);
+  const matchedInstruction = r.valid.filter((p) => assigned.includes(p.pid) && Math.abs(p.score / SCORE_MAX - target) <= BLOC_TOLERANCE).map((p) => p.pid);
+  const otherOut = g.graded.filter((x) => x.forfeit > 0 && !matchedInstruction.includes(x.pid)).length;
+  const blocOut = g.graded.filter((x) => x.forfeit > 0 && matchedInstruction.includes(x.pid)).length;
+  const blocShare = g.graded.filter((x) => x.within && matchedInstruction.includes(x.pid)).reduce((s, x) => s + x.share, 0);
   const share = Math.round((assigned.length / Math.max(r.valid.length, 1)) * PERCENT_SCALE);
-  const head = `Bloc assigned to ${share}% of the jury · ${complied.length} of ${assigned.length} complied`;
-  if (!complied.length) return banner("good", head, "Nobody followed the instruction. The attack never happened.");
-  if (blocOut > 0 && otherOut === 0) return banner("good", head, "The bloc sat outside the band and paid for it.");
-  if (otherOut > 0) return banner("bad", head, `${otherOut} other juror${otherOut === 1 ? "" : "s"} and ${blocOut} following the bloc instruction forfeited; ${complied.length - blocOut} following the instruction stayed inside the band. A bloc can move a mean. The full design uses random stake-weighted draws and appeals to larger juries; neither is performed in this game.`);
-  return banner("amber", head, `The bloc landed inside the band and took ${Math.round(blocShare * PERCENT_SCALE)}% of the pot. It moved the centre without costing anyone a forfeit.`);
+  const head = `Bloc assigned to ${share}% of revealed jurors · ${matchedInstruction.length} of ${assigned.length} submitted the instructed score`;
+  if (!matchedInstruction.length) return banner("good", head, "No assigned juror submitted the instructed score. This attack did not appear in the revealed scores.");
+  if (blocOut > 0 && otherOut === 0) return banner("good", head, `${blocOut} assigned juror${blocOut === 1 ? "" : "s"} submitting the instructed score forfeited. The penalty bit the instructed bloc in this round.`);
+  if (otherOut > 0) return banner("bad", head, `${otherOut} other juror${otherOut === 1 ? "" : "s"} and ${blocOut} assigned jurors submitting the instructed score forfeited; ${matchedInstruction.length - blocOut} assigned jurors submitting that score stayed inside the band. A bloc can move a mean. The full design uses commit and reveal, anti-prereveal games and appeals to deter collusion.`);
+  return banner("amber", head, `Assigned jurors submitting the instructed score took ${Math.round(blocShare * PERCENT_SCALE)}% of the pot. Nobody who revealed paid a distance forfeit.`);
 }
 
 function nextBtn() {
@@ -1393,21 +1393,22 @@ function renderResults() {
   const up = (myNet || 0) >= 0;
   const label = !mine ? (r.recused.includes(myPid) ? "recused" : "no reveal") : mine.within ? "coherent" : "outlier";
   const verdict = typeof myNet === "number"
-    ? `<div class="verdict ${up ? "win" : "lose"}"><span class="v-amt">${signed(myNet)}</span><span class="v-side"><span class="v-label">${label}${wasLeaked ? " · reported" : ""}${bounty ? " · bounty" : ""}</span><span class="v-stats">${mine ? `<span>you <b>${mine.score.toFixed(2)}</b></span>` : ""}<span>mean <b>${g.centre.toFixed(2)}</b></span><span>band <b>±${g.half.toFixed(3)}</b></span>${mine ? `<span>off by <b>${mine.distance.toFixed(3)}</b> · ${mine.bands.toFixed(1)} bands</span>` : ""}${mine && mine.within ? `<span>share of pot <b>${(mine.share * PERCENT_SCALE).toFixed(1)}%</b></span>` : ""}${mine && !mine.within ? `<span>forfeit <b>${(mine.penalty * PERCENT_SCALE).toFixed(0)}%</b> of stake</span>` : ""}</span></span></div>`
+    ? `<div class="verdict ${up ? "win" : "lose"}"><span class="v-amt">${signed(myNet)}</span><span class="v-side"><span class="v-label">${label}${wasLeaked ? " · reported" : ""}${bounty ? " · bounty" : ""}</span><span class="v-stats">${mine ? `<span>you <b>${mine.score.toFixed(2)}</b></span>` : ""}<span>mean <b>${g.centre.toFixed(2)}</b></span><span>band <b>±${g.half.toFixed(3)}</b></span>${mine ? `<span>off by <b>${mine.distance.toFixed(3)}</b>${g.forfeitsEnabled ? ` · ${mine.bands.toFixed(1)} bands` : ""}</span>` : ""}${mine && mine.within ? `<span>share of pot <b>${(mine.share * PERCENT_SCALE).toFixed(1)}%</b></span>` : ""}${mine && !mine.within && g.forfeitsEnabled ? `<span>forfeit <b>${(mine.penalty * PERCENT_SCALE).toFixed(0)}%</b> of stake</span>` : ""}</span></span></div>`
     : "";
   const leakBan = leaks.length ? banner("amber", `${leaks.length} reported for pre-revelation`, leaks.map((l) => `${pname(l.leakerPid)} → ${pname(l.reporterPid)}`).join(", ")) : "";
   app.innerHTML = netBanner() + lateRevealBanner() + verdict + (c.bloc ? blocBanner(c, r, g) : "") + leakBan +
     `<div class="split"><div class="stack"><div class="card">${trackHtml(g, r.valid)}` +
-    `<div class="strip"><div class="g"><b>${g.coherentCount}</b><span>paid</span></div><div class="r"><b>${g.outlierCount}</b><span>forfeiting</span></div><div><b>${n(g.pot)}</b><span>pot: ${n(C.ROUND_REWARD)} reward + forfeits</span></div></div>` +
+    `<div class="strip"><div class="g"><b>${g.coherentCount}</b><span>paid</span></div><div class="r"><b>${g.forfeitsEnabled ? g.outlierCount : 0}</b><span>forfeiting</span></div><div><b>${n(g.pot)}</b><span>pot: ${n(C.ROUND_REWARD)} reward + forfeits</span></div></div>` +
     '<table><thead><tr><th>Juror</th><th class="num">Score</th><th class="num">Off by</th><th class="num">Grade</th><th class="num">Net</th></tr></thead><tbody>' +
     g.graded.slice().sort((a, b) => a.score - b.score).map((x) => {
       const net = r.delta[x.pid] || 0;
-      return `<tr class="${x.pid === myPid ? "me" : ""}"><td>${esc(pname(x.pid))}</td><td class="num">${x.score.toFixed(2)}</td><td class="num">${x.distance.toFixed(3)} · ${x.bands.toFixed(1)}×</td><td class="num ${x.within ? "up" : "down"}">${x.within ? `${(x.share * PERCENT_SCALE).toFixed(1)}% of pot` : `${(x.penalty * PERCENT_SCALE).toFixed(0)}% of stake`}</td><td class="num ${net >= 0 ? "up" : "down"}">${signed(net)}</td></tr>`;
+      return `<tr class="${x.pid === myPid ? "me" : ""}"><td>${esc(pname(x.pid))}</td><td class="num">${x.score.toFixed(2)}</td><td class="num">${x.distance.toFixed(3)}${g.forfeitsEnabled ? ` · ${x.bands.toFixed(1)}×` : ""}</td><td class="num ${x.within ? "up" : "down"}">${x.within ? `${(x.share * PERCENT_SCALE).toFixed(1)}% of pot` : g.forfeitsEnabled ? `${(x.penalty * PERCENT_SCALE).toFixed(0)}% of stake` : "no distance forfeit"}</td><td class="num ${net >= 0 ? "up" : "down"}">${signed(net)}</td></tr>`;
     }).join("") + "</tbody></table>" +
     (r.absent.length ? `<p class="fine">${r.absent.map((pid) => esc(pname(pid))).join(", ")} did not reveal in time: −${n(GAME_ANTE)} each.</p>` : "") +
     (r.recused.length ? `<p class="fine">${r.recused.map((pid) => esc(pname(pid))).join(", ")} recused: no stake, no share, no fine for silence.</p>` : "") +
     (c.note ? `<p class="fine">${esc(c.note)}</p>` : "") +
-    `<p class="fine">Off by is measured in bands of ±${g.half.toFixed(3)} (${C.K} × the jury’s spread${g.mad > g.madRaw ? `, floored at ${g.mad.toFixed(2)}` : ` of ${g.madRaw.toFixed(3)}`}). ${C.TOTAL_FORFEIT_BANDS} bands out is a total forfeit. Inside the band this game pays by closeness to the mean.</p>` +
+    `<p class="fine">The band is ±${g.half.toFixed(3)}: ${C.K} × the jury’s weighted standard deviation of ${g.spread.toFixed(3)}. ${g.forfeitsEnabled ? `Off by is also shown in bands; ${C.TOTAL_FORFEIT_BANDS} bands out is a total forfeit.` : "The spread is essentially zero, so distance forfeits are off."} Inside the band this game pays by closeness to the mean.</p>` +
+    `<p class="fine">${esc(SESSION.workshopReward)}</p>` +
     `</div></div><div class="stack"><div class="card"><h3>Standings</h3>${standingsHtml()}</div>${hostBar(nextBtn())}</div></div>${console_()}`;
   wireHost();
   wireNext();

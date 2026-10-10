@@ -12,7 +12,9 @@ type Graded = {
 };
 type Grading = {
   centre: number;
+  spread: number;
   half: number;
+  forfeitsEnabled: boolean;
   graded: Graded[];
   coherentCount: number;
   outlierCount: number;
@@ -24,7 +26,7 @@ type Core = {
   ROUND_REWARD: number;
   LEAK_PENALTY: number;
   LEAK_BOUNTY: number;
-  SIGMA_MIN: number;
+  DISPERSION_EPSILON: number;
   K: number;
   TOTAL_FORFEIT_BANDS: number;
   penaltyAt(d: number, half: number): number;
@@ -103,11 +105,61 @@ describe("the payout shape", () => {
     expect(g.pot).toBeCloseTo(g.forfeited + C.ROUND_REWARD, 6);
   });
 
-  it("floors the band so a near-unanimous jury forfeits nobody", () => {
-    const g = C.grade(jury([0.9, 0.9, 0.9, 0.9, 0.9, 0.84]), 0);
+  it("keeps the forty-percent bloc inside the standard-deviation band", () => {
+    const scores = [...Array<number>(9).fill(0.3), ...Array<number>(6).fill(0.9)];
+    const g = C.grade(jury(scores), C.ROUND_REWARD);
     if (!g) throw new Error("graded nothing");
-    expect(g.half).toBeCloseTo(C.K * C.SIGMA_MIN);
+    expect(g.graded.map((entry) => entry.penalty)).toEqual(Array<number>(scores.length).fill(0));
+    expect(g.centre).toBeCloseTo(0.54);
+    expect(g.spread).toBeCloseTo(0.2939387691339814);
+    expect(g.half).toBeCloseTo(0.3674234614174768);
     expect(g.outlierCount).toBe(0);
+  });
+
+  it("splits the full reward by stake when identical scores collapse the band", () => {
+    const score = 0.9;
+    const g = C.grade(
+      [
+        { pid: "p0", score, stake: C.GAME_ANTE },
+        { pid: "p1", score, stake: 2 * C.GAME_ANTE },
+      ],
+      C.ROUND_REWARD,
+    );
+    if (!g) throw new Error("graded nothing");
+    expect(g.half).toBe(0);
+    expect(g.centre).toBe(score);
+    expect(g.spread).toBe(0);
+    expect(g.forfeitsEnabled).toBe(false);
+    expect(g.graded.map((entry) => entry.penalty)).toEqual([0, 0]);
+    expect(g.graded[0]?.net).toBeCloseTo(C.ROUND_REWARD / 3);
+    expect(g.graded[1]?.net).toBeCloseTo((2 * C.ROUND_REWARD) / 3);
+  });
+
+  it("weights both the centre and spread by stake at the score endpoints", () => {
+    const g = C.grade(
+      [
+        { pid: "p0", score: 0, stake: C.GAME_ANTE },
+        { pid: "p1", score: 1, stake: 3 * C.GAME_ANTE },
+      ],
+      C.ROUND_REWARD,
+    );
+    if (!g) throw new Error("graded nothing");
+    expect(g.centre).toBe(0.75);
+    expect(g.spread).toBeCloseTo(0.4330127018922193);
+    expect(g.graded[0]?.penalty).toBeCloseTo(0.3856406460551018);
+  });
+
+  it("suspends distance forfeits below the dispersion cutoff and enables them at it", () => {
+    const tinyScore = 3e-9;
+    const low = C.grade(jury([...Array<number>(29).fill(0), tinyScore]), C.ROUND_REWARD);
+    if (!low) throw new Error("graded nothing");
+    expect(low.forfeitsEnabled).toBe(false);
+    expect(low.outlierCount).toBe(1);
+    expect(low.graded.at(-1)?.penalty).toBe(0);
+    const boundary = C.grade(jury([0, 2 * C.DISPERSION_EPSILON]), C.ROUND_REWARD);
+    if (!boundary) throw new Error("graded nothing");
+    expect(boundary.spread).toBe(C.DISPERSION_EPSILON);
+    expect(boundary.forfeitsEnabled).toBe(true);
   });
 
   it("takes the lower value when the weighted median is a tie", () => {

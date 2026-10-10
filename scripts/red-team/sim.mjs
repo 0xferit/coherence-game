@@ -14,7 +14,7 @@ function run(label, entries) {
   }
   console.log(`\n== ${label}`);
   console.log(
-    `centre ${g.centre.toFixed(3)}  madRaw ${g.madRaw.toFixed(3)}  mad ${g.mad.toFixed(3)}  half ${g.half.toFixed(3)}  band [${g.lo.toFixed(3)}, ${g.hi.toFixed(3)}]  inside ${g.coherentCount} out ${g.outlierCount}  pot ${g.pot}`,
+    `centre ${g.centre.toFixed(3)}  spread ${g.spread.toFixed(3)}  half ${g.half.toFixed(3)}  band [${g.lo.toFixed(3)}, ${g.hi.toFixed(3)}]  inside ${g.coherentCount} out ${g.outlierCount}  distance forfeits ${g.forfeitsEnabled ? "on" : "off"}  pot ${g.pot}`,
   );
   for (const [k, xs] of Object.entries(groups)) {
     const share = xs.reduce((s, x) => s + x.share, 0);
@@ -97,10 +97,8 @@ for (const pct of [0, 20, 33, 40, 47, 53, 60]) {
     BASE.map((s, i) => ({ pid: i < nb ? `bloc${i}` : `base${i}`, score: i < nb ? 0.9 : s })),
   );
 }
-// J: anchors vs band: a tight room at 0.92 and a juror on the published anchor 0.75
 console.log(
-  "\nminimum half band =",
-  (C.K * C.SIGMA_MIN).toFixed(4),
-  " total forfeit at distance >=",
-  (2 * C.K * C.SIGMA_MIN).toFixed(3),
+  "\nDistance forfeits are disabled below spread",
+  C.DISPERSION_EPSILON,
+  "; the band has no width floor.",
 );

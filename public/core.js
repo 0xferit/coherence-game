@@ -7,7 +7,7 @@ import { GAME_PHASE, SCORE_MAX, SCORE_MIN } from "./protocol.js";
   var LEAK_PENALTY = GAME_ANTE;
   var LEAK_BOUNTY_FRACTION = 0.5;
   var LEAK_BOUNTY = LEAK_PENALTY * LEAK_BOUNTY_FRACTION;
-  var SIGMA_MIN = 0.05;
+  var DISPERSION_EPSILON = 1e-9;
   var K = 1.25;
   var TOTAL_FORFEIT_BANDS = 2;
   var EDGE_TOLERANCE = 1e-9;
@@ -16,8 +16,12 @@ import { GAME_PHASE, SCORE_MAX, SCORE_MIN } from "./protocol.js";
     return Math.min(1, Math.max(0, x));
   }
 
+  function totalStake(entries) {
+    return entries.reduce((sum, e) => sum + e.stake, 0);
+  }
+
   function weightedMedian(entries, entryValue) {
-    var total = entries.reduce((sum, e) => sum + e.stake, 0);
+    var total = totalStake(entries);
     var order = entries
       .map((e, i) => i)
       .sort((a, b) => entryValue(entries[a]) - entryValue(entries[b]));
@@ -37,17 +41,27 @@ import { GAME_PHASE, SCORE_MAX, SCORE_MIN } from "./protocol.js";
   }
 
   function closenessAt(d, half) {
+    if (half === 0) return d === 0 ? 1 : 0;
     return d <= half ? 1 - d / half : 0;
   }
 
   function stakeWeightedMean(entries) {
-    var total = 0;
-    var weighted = 0;
+    var scoreOrigin = entries[0].score;
+    var total = totalStake(entries);
+    var weightedScoreDifference = 0;
     entries.forEach((e) => {
-      total += e.stake;
-      weighted += e.score * e.stake;
+      weightedScoreDifference += (e.score - scoreOrigin) * e.stake;
     });
-    return total ? weighted / total : 0;
+    return total ? scoreOrigin + weightedScoreDifference / total : 0;
+  }
+
+  function stakeWeightedStandardDeviation(entries, centre) {
+    var total = totalStake(entries);
+    var weightedSquaredDistance = entries.reduce(
+      (sum, e) => sum + e.stake * (e.score - centre) ** 2,
+      0,
+    );
+    return total ? Math.sqrt(weightedSquaredDistance / total) : 0;
   }
 
   function shareByStake(coherent) {
@@ -56,16 +70,21 @@ import { GAME_PHASE, SCORE_MAX, SCORE_MIN } from "./protocol.js";
     });
   }
 
+  /**
+   * Grades validated normalized scores and positive stakes without changing the inputs.
+   * Empty input returns null. Below the dispersion cutoff, distance forfeits are disabled.
+   * Identical scores share the supplied reward in proportion to stake.
+   */
   function grade(entries, extraPot) {
     if (!entries.length) return null;
     var centre = stakeWeightedMean(entries);
-    var madRaw = weightedMedian(entries, (e) => Math.abs(e.score - centre));
-    var mad = Math.max(madRaw, SIGMA_MIN);
-    var half = K * mad;
+    var spread = stakeWeightedStandardDeviation(entries, centre);
+    var half = K * spread;
+    var forfeitsEnabled = spread >= DISPERSION_EPSILON;
     var graded = entries.map((e) => {
       var d = Math.abs(e.score - centre);
       var within = d <= half + EDGE_TOLERANCE;
-      var penalty = within ? 0 : penaltyAt(d, half);
+      var penalty = within || !forfeitsEnabled ? 0 : penaltyAt(d, half);
       var closeness = within ? closenessAt(Math.min(d, half), half) : 0;
       return {
         pid: e.pid,
@@ -89,14 +108,14 @@ import { GAME_PHASE, SCORE_MAX, SCORE_MIN } from "./protocol.js";
     var pot = forfeited + (extraPot || 0);
     graded.forEach((g) => {
       g.share = g.within && totalShareWeight ? g.shareWeight / totalShareWeight : 0;
-      g.bands = g.distance / half;
+      g.bands = half ? g.distance / half : 0;
       g.net = g.within ? pot * g.share : -g.forfeit;
     });
     return {
       centre: centre,
-      madRaw: madRaw,
-      mad: mad,
+      spread: spread,
       half: half,
+      forfeitsEnabled: forfeitsEnabled,
       lo: centre - half,
       hi: centre + half,
       graded: graded,
@@ -207,7 +226,7 @@ import { GAME_PHASE, SCORE_MAX, SCORE_MIN } from "./protocol.js";
     ROUND_REWARD: ROUND_REWARD,
     LEAK_PENALTY: LEAK_PENALTY,
     LEAK_BOUNTY: LEAK_BOUNTY,
-    SIGMA_MIN: SIGMA_MIN,
+    DISPERSION_EPSILON: DISPERSION_EPSILON,
     K: K,
     TOTAL_FORFEIT_BANDS: TOTAL_FORFEIT_BANDS,
     clamp01: clamp01,

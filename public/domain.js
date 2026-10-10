@@ -49,35 +49,35 @@ const DEFAULT_NOMINEES = [
     name: "Inkscape",
     blurb:
       "The free vector drawing program, built largely by volunteers since 2003, behind a great many conference posters, journal figures and lab logos.",
-    note: "The bottom of the scale, the same shape as the worked colour map. You may have made your last poster in it; that is how much you use it, and it is excluded. Little in research breaks without it: the few pipelines that call it to convert SVG have other converters, and substitutes are plentiful. Scoring it high scores good software; the prompt asks a narrower thing.",
+    note: "A low reading follows the substitute test, as in the worked colour map. You may have made your last poster in it; personal use is excluded. Ask what would break without this particular tool and whether another vector editor or converter could replace it. A high score needs a case about research's reliance, rather than how good the software is. Hear that case before interpreting the result.",
   },
   {
     key: "linux",
     name: "Linux",
     blurb:
       "The free operating system most researchers don’t run on their laptop, yet it runs every machine on the TOP500 list of the fastest supercomputers, and most of the clusters and cloud servers where analysis happens.",
-    note: "The top of the scale, and the tightest jury. When everyone agrees the band narrows with them: a juror at 0.75 among a jury at 0.92 can forfeit while being, in any ordinary sense, right. Coherence is measured against the room.",
+    note: "A high reading follows the reach and reliance tests. Ask whether the room's reasons support that reading. A tight cluster narrows the band, so a juror can forfeit despite giving a defensible score. Inspect the actual centre, band and payout; coherence is measured against this room, and agreement does not establish truth.",
   },
   {
     key: "pdf",
     name: "PDF",
     blurb:
       "The format most papers are downloaded and read in. Adobe created it in 1993 and published the spec free from the start; since 2008 it has been an ISO standard (ISO 32000), kept up by an ISO committee.",
-    note: "Reliance is enormous, and the split comes from the third test. HTML and JATS versions of papers now sit beside the PDF on arXiv and PubMed Central, so some jurors will say a substitute is arriving; others will say most of the literature still exists only as PDF. ‘PDF is where data goes to die’ is taste: excluded. Both readings of ‘any substitute’ are inside the policy; the band is set by the larger group, and the smaller one pays for the split.",
+    note: "The substitute test may divide the room: some jurors see web and structured-text versions of papers as replacements; others emphasize the existing literature and workflows. A preference for another format is excluded; an argument about what breaks or cannot be reused may bear on reliance and substitutes. Hear the reasons for each reading. A split can widen the band; being in the smaller group does not by itself imply a forfeit. Inspect what the revealed scores actually earned.",
   },
   {
     key: "latex",
     name: "LaTeX",
     blurb:
       "The typesetting system much of mathematics, physics and computer science is written in. Knuth froze his TeX engine in 1990, bar bug fixes; LaTeX runs on successors such as pdfTeX and LuaTeX, kept up by a small volunteer team.",
-    note: "Your field is not the field. A mathematician cannot picture research without it; a clinician may never have opened it, because Word does the job there. The prompt asks about research as a whole, so your own field gets no extra weight. Jurors who score their own desk scatter, and the band is as wide as the larger group's agreement, so the scattered ones pay.",
+    note: "Your field is not the field. A mathematician may find it indispensable; a clinician may use another tool. The prompt asks about research as a whole, so your own field gets no extra weight. Ask how jurors considered reliance beyond their own desk. Different readings can widen the band, and the mean and spread use every opened score. Do not infer a forfeit from a minority reading alone.",
   },
   {
     key: "arxiv",
     name: "arXiv",
     blurb:
       "The preprint server where much of physics, mathematics and computer science has appeared first since 1991: more than three million papers, free to post and free to read. Moderated, not peer-reviewed.",
-    note: "The honest read is high: whole fields read it before any journal, it is free at both ends, and nothing replaces it at its scale. ‘It’s flooded with AI-written papers’ is a real worry, and it is a judgment of the quality of its contents: excluded by name. A cluster near 0.10 was following an instruction, not the policy. Whether it paid for that depends on how much of the jury it held.",
+    note: "A high reading follows its role in sharing research before journal publication. ‘It’s flooded with AI-written papers’ judges the quality of its contents, which the policy excludes. Use the banner to distinguish who was assigned the private instruction, who submitted its score and what they earned. A matching score does not establish a juror's motive. If the bloc is paid, discuss capture; if it forfeits, discuss where the penalty bites. Neither outcome establishes a safe threshold.",
     bloc: true,
     blocScore: "0.10",
     blocCover: "it’s flooded with AI-written papers",
@@ -97,7 +97,7 @@ const SPARE_NOMINEES = [
     name: "Software Heritage",
     blurb:
       "The archive of publicly available source code, started at Inria in 2016 and backed by UNESCO since 2017. It keeps copies of code from hosts that have since shut down, such as Google Code and Gitorious.",
-    note: "The three tests disagree. Most researchers never open it directly, and if it stopped today little would break this week beyond Guix source fallbacks and SWHID links. But for code gone from its original host it can be the only copy left, and ‘kept’ is in the prompt. Weigh this week and you land low; weigh the record and you land high. The band follows whichever reading more of the jury takes.",
+    note: "The three tests may pull in different directions. Some jurors emphasize what would break this week; others emphasize preserving code that has disappeared from its original host. ‘Kept’ is in the prompt. Hear both readings and inspect the result: the mean and spread use every opened score, so a split can widen the band rather than automatically penalize the smaller group.",
   },
   {
     key: "git",

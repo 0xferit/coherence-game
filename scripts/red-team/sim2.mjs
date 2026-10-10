@@ -26,20 +26,20 @@ function run(label, entries) {
       `  ${k.padEnd(7)} n=${xs.length} inside ${xs.filter((x) => x.within).length} share ${(xs.reduce((s, x) => s + x.share, 0) * 100).toFixed(1)}% perHead ${((xs.reduce((s, x) => s + x.net, 0) / xs.length / A) * 100).toFixed(0)}% of ante  avgBands ${(xs.reduce((s, x) => s + x.bands, 0) / xs.length).toFixed(2)}`,
     );
 }
-run("live arXiv: bloc 55% = 17/30 at 0.10, honest 13 around 0.85", [
+run("illustrative arXiv: bloc 17 of 30 at 0.10, honest 13 around 0.85", [
   ...flat(0.1, 17, "bloc"),
   ...spread(0.85, 13, 0.01, "honest"),
 ]);
-run("live arXiv with one lazy 0.50: bloc 17, lazy 1, honest 12", [
+run("illustrative arXiv with one lazy 0.50: bloc 17, lazy 1, honest 12", [
   ...flat(0.1, 17, "bloc"),
   { pid: "lazy0", score: 0.5 },
   ...spread(0.85, 12, 0.01, "honest"),
 ]);
-run("live arXiv, 5 of 17 bloc members defect to honest 0.85 (bloc 12/30)", [
+run("illustrative arXiv, 5 of 17 bloc members defect to honest 0.85 (bloc 12/30)", [
   ...flat(0.1, 12, "bloc"),
   ...spread(0.85, 18, 0.01, "honest"),
 ]);
-run("stake-weighted: one staker with 51% at 0.00, 14 at 0.90", [
+run("stake-weighted: one staker with 15 of 29 stake units at 0.00, 14 at 0.90", [
   { pid: "whale0", score: 0.0, stake: 15 * A },
   ...spread(0.9, 14, 0.005, "honest"),
 ]);

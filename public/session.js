@@ -23,8 +23,10 @@ export const SESSION = Object.freeze({
   paperUrl: `https://doi.org/${PAPER_DOI}`,
   attribution: `${PROJECT} research by Ferit Tunçer.`,
   support: "Supported by Octant.",
+  workshopReward:
+    "Workshop simplification: each round with opened scores pays the full base reward, even when those scores all agree.",
   nextRound:
-    "Arrow, the first funded round of this design, runs at Octant in early 2027: an invited jury of domain experts scores a real docket under a published policy.",
+    "Arrow, the first funded round of this design, runs at Octant in early 2027: an invited jury of domain experts scores a real docket under a published policy. Arrow’s invited jury is assumed not to collude.",
   nextRoundUrl: "https://octant.build",
   copyright: COPYRIGHT,
   codeLicence: CODE_LICENCE,

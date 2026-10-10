@@ -56,11 +56,17 @@ The former address, `coherence-game.0xferit.workers.dev`, is a second deployment
 
 `public/domain.js` defines the policy, nominee descriptions and default docket once. The game, deck and paper tool consume those records. `public/session.js` supplies the session facts, attribution and addresses to the pages and generation scripts. `public/core.js` imports the shared score bounds and exposes the ledger through `globalThis.JuryCore`; consumers import it before deriving results.
 
+The ledger follows the working paper's stake-weighted mean and population standard deviation. Its `grade` result supplies `spread`, the band half-width and `forfeitsEnabled` to every renderer. The band has no minimum width. Below `DISPERSION_EPSILON`, distance forfeits are disabled; identical scores have zero spread and split the reward by stake. The numerical cutoff, band multiplier and payout rules are authoritative in the ledger, rather than reconstructed by clients.
+
+Individual reward shares grow linearly with closeness inside the band and are normalized across eligible jurors. The workshop keeps the full base reward for each non-void round; it does not implement the paper's dispersion-dependent reduction of that total. The public explanation of this simplification is defined once in `SESSION.workshopReward`. Neither the ledger nor the room stores a reward-history window.
+
 The protocol module also defines room paths, canonical room routing, the sealed-score encoding and mailing-list input limits. The session module derives address confirmation from its authoritative site value. Browser validation and server routing share the same room grammar; no page constructs an independent route or phase definition.
 
 The browser authenticates every new socket before replaying writes or owner subscriptions. Local sealed values are persisted by their hash before network transmission. A storage failure prevents sealing; an ambiguous timeout cannot discard an accepted seal. Overlapping acknowledgements across tabs cannot replace the salt needed by the authoritative seal. A restored browser page reloads to establish a fresh authenticated connection. Disconnection and terminal subscription failures are visible to the juror.
 
 The shared stylesheet supplies the paper design tokens. The deck reuses the permitted figures and presents random draws as a discussed defence. The printable handout and score sheets are generated from the same session and docket records as the live pages.
+
+The deck places its payment and collusion figures beside their explanations on larger screens. On narrow screens, the content scrolls in a reading area with a separate navigation strip, so controls do not cover text. CSS owns chart row heights; the widget supplies only its juror count.
 
 ## Dependency integrity
 
